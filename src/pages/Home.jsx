@@ -3,10 +3,13 @@ import { styled } from 'styled-components';
 import Mainillust from '../assets/svg/Mainillust.svg';
 import AnimationBar from '../components/animationBar';
 import Footer from '../components/footer/Footer';
+import Nav from '../components/nav/Nav';
+import colors from '../style/color';
 
 function Home() {
   return (
     <>
+    <Nav />
     <AnimationBar />
     <TextBoxLayout>
           <TextBox>
@@ -26,7 +29,7 @@ function Home() {
           <ImgStyle>
             <img src={Mainillust} alt='Iterview' />
           </ImgStyle>
-          {/* <StartButtonLayout onClick={StartClickHandler}>시작하기</StartButtonLayout> */}
+          <Button>시작하기</Button>
     </TextBoxLayout>
     <Footer />
     </>
@@ -72,8 +75,32 @@ const ImgStyle = styled.div`
   top: 442px;
 
   margin-top: 60px;
-  margin-bottom: 73px;
+  margin-bottom: 60.64px;
 `
 const Textjump = styled.div`
   padding-left: 7px;
+`
+
+const Button = styled.button`
+  width: 315px;
+  height: 73px;
+  z-index: 1;
+
+  background: ${colors.white_100};
+  box-shadow: 0px 0px 12.9193px rgba(0, 0, 0, 0.1);
+  border-radius: 76px;
+
+  color: ${colors.black_100};
+  font-weight: 800;
+  font-size: 25.8385px;
+  line-height: 35px;
+  letter-spacing: 0.05em;
+  transition: .3s;
+
+  border: none;
+
+  &:hover {
+    transform: scale(1.1, 1.1);
+  }
+
 `
