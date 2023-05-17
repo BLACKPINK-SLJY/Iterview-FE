@@ -153,4 +153,6 @@ const SpanStyle = styled.span`
   font-weight: 700;
   text-decoration-line: underline;
   color: ${colors.black_80};
+
+  cursor: pointer;
 `

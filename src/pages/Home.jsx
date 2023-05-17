@@ -86,11 +86,11 @@ const Button = styled.button`
   height: 73px;
   z-index: 1;
 
-  background: ${colors.white_100};
+  background: linear-gradient(135.86deg, #9E3DFF 0%, #3840FF 100%);
   box-shadow: 0px 0px 12.9193px rgba(0, 0, 0, 0.1);
   border-radius: 76px;
 
-  color: ${colors.black_100};
+  color: ${colors.white_100};
   font-weight: 800;
   font-size: 25.8385px;
   line-height: 35px;
