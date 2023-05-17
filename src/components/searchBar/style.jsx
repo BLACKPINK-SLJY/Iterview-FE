@@ -1,6 +1,7 @@
 import styled from "styled-components";
 
 export const SearchBoxStyle = styled.div`
+    margin-top: 8px;
     height: 40px;
     position: relative;
     

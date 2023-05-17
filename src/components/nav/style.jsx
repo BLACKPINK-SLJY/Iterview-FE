@@ -8,6 +8,12 @@ export const NavLayout = styled.div`
     display: flex;
     justify-content: space-around;
 `
+export const NavLayout2 = styled.div`
+    width: 100%;
+    height: 104px;
+    background-color: ${colors.black_100};
+    display: flex;
+`
 
 export const Logos = styled.div`
     display: flex;
@@ -30,7 +36,7 @@ export const LoginButton = styled.button`
     line-height: 20px;
     letter-spacing: 0.05em;
     border: none;
-    
+
     cursor: pointer;
 `
 
@@ -55,6 +61,13 @@ export const SignUpButton = styled.button`
 
 export const SignButtonLayout = styled.div`
     gap: 24px;
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+`
+export const SearchNickLayout = styled.div`
+    gap: 34px;
     display: flex;
 
     justify-content: center;
