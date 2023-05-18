@@ -27,8 +27,8 @@ function Nav() {
     <>
     <NavLayout>
         <Logos onClick={onClickHome}>
-            <img src={Logo} alt="logo" />
-            <img src={Logo2} alt="iterview" />
+            <img src={Logo} alt="logo" style={{cursor: "pointer"}}/>
+            <img src={Logo2} alt="iterview" style={{cursor: "pointer"}}/>
             <DropdownSelect style={{marginLeft: "14px"}}>
             <TextStyle>직무선택</TextStyle>
             <FontAwesomeIcon icon={faAngleDown} style={{color:"white", paddingTop:"13px"}} />
@@ -58,6 +58,7 @@ const TextStyle = styled.div`
   line-height: 27px;
   letter-spacing: 0.05em;
   color: white;
+  cursor: pointer;
 `
 const SpanStyle = styled.span`
  font-weight: 400;
@@ -66,4 +67,5 @@ const SpanStyle = styled.span`
 const DropdownSelect = styled.div`
   display: flex;
   gap: 6px;
+  cursor: pointer;
 `

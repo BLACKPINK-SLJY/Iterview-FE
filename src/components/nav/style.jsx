@@ -19,7 +19,6 @@ export const Logos = styled.div`
     display: flex;
     gap: 20px;
     align-items: center;
-    cursor: pointer;
 `
 
 export const LoginButton = styled.button`
