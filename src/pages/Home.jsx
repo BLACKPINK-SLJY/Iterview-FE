@@ -5,8 +5,15 @@ import AnimationBar from '../components/animationBar';
 import Footer from '../components/footer/Footer';
 import Nav from '../components/nav/Nav';
 import colors from '../style/color';
+import { useNavigate } from 'react-router-dom';
 
 function Home() {
+  const navigate = useNavigate();
+
+  const onclickSelect = () => {
+    navigate('/select');
+  }
+
   return (
     <>
     <Nav />
@@ -27,9 +34,9 @@ function Home() {
             </Textjump>
           </TextBox>
           <ImgStyle>
-            <img src={Mainillust} alt='Iterview' />
+            <img src={Mainillust} alt='Iterview' width="900px" />
           </ImgStyle>
-          <Button>시작하기</Button>
+          <Button onClick={onclickSelect}>시작하기</Button>
     </TextBoxLayout>
     <Footer />
     </>
@@ -44,7 +51,7 @@ const TextBoxLayout = styled.div`
   align-items: center;
 
   margin-top: 123px;
-  margin-bottom: 122px;
+  margin-bottom: 280px;
 `
 const TextBox = styled.div`
   display: flex;
@@ -52,7 +59,7 @@ const TextBox = styled.div`
 `
 const GradientText = styled.div`
   font-weight: 600;
-  font-size: 29.2726px;
+  font-size: 35.2726px;
   line-height: 50px;
 
   background: linear-gradient(135.86deg, #9E3DFF 0%, #3840FF 100%);
@@ -65,17 +72,15 @@ const NotgradientText = styled.div`
   font-family: 'Noto Sans';
   font-style: normal;
   font-weight: 500;
-  font-size: 29.2726px;
+  font-size: 35.2726px;
   line-height: 50px;
 `
 const ImgStyle = styled.div`
-  width: 702.1px;
-  height: 324.36px;
   left: 369px;
   top: 442px;
 
   margin-top: 60px;
-  margin-bottom: 60.64px;
+  margin-bottom: 80px;
 `
 const Textjump = styled.div`
   padding-left: 7px;
@@ -102,5 +107,4 @@ const Button = styled.button`
   &:hover {
     transform: scale(1.1, 1.1);
   }
-
 `

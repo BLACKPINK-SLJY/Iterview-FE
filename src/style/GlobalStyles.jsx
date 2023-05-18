@@ -47,7 +47,7 @@ table {
 
 body{
   background-color: #F5F5F7;
-  zoom: 65%;
+  zoom: 70%;
 }
 a{
   text-decoration: none;
