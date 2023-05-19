@@ -18,13 +18,12 @@ function Signup() {
   return (
     <>
     <Nav />
-    <AnimationBar />
     <FormStyle>
       <JoinImg src={SignUpImg} alt='login' />
           <LoginEmailBoxLayout>
-            <div>닉네임</div>
+            <div>아이디</div>
               <PlaceholderStyle
-                  placeholder='잇터뷰이'
+                  placeholder='아이디를 입력해 주세요.'
                   type='text'
                   value={username}
                   onChange={(e) => {
@@ -32,21 +31,10 @@ function Signup() {
                   }}
               />
           </LoginEmailBoxLayout>
-          <LoginPasswordBoxLayout>
-                <div>이메일</div>
-                <PlaceholderStyle
-                    placeholder='example@example.com'
-                    type="email"
-                    value={email}
-                    onChange={(e) => {
-                        setEmail(e.target.value);
-                    }}
-                />
-            </LoginPasswordBoxLayout>
             <LoginPasswordBoxLayout>
                 <div>비밀번호</div>
                 <PlaceholderStyle
-                    placeholder='••••••••'
+                    placeholder='비밀번호를 입력해 주세요.'
                     type="password"
                     value={password}
                     onChange={(e) => {
@@ -57,7 +45,7 @@ function Signup() {
             <LoginPasswordBoxLayout>
                 <div>비밀번호 확인</div>
                 <PlaceholderStyle
-                    placeholder='••••••••'
+                    placeholder='비밀번호 확인'
                     type="password"
                     value={passwordConfirm}
                     onChange={(e) => {

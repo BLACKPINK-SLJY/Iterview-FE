@@ -24,14 +24,13 @@ function Login() {
   return (
     <>
     <Nav />
-    <AnimationBar />
     <FormStyle>
       <LoginImg src={LoginS} alt='login' />
       <LoginEmailBoxLayout>
-                <div>이메일</div>
+                <div>아이디</div>
                 <PlaceholderStyle
-                    placeholder='example@example.com'
-                    type="email"
+                    placeholder='아이디를 입력해 주세요.'
+                    type="text"
                     value={email}
                     onChange={(e) => {
                         setEmail(e.target.value);
@@ -41,7 +40,7 @@ function Login() {
             <LoginPasswordBoxLayout>
                 <div>비밀번호</div>
                 <PlaceholderStyle
-                    placeholder='••••••••'
+                    placeholder='비밀번호를 입력해 주세요.'
                     type="password"
                     value={password}
                     onChange={(e) => {
