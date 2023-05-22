@@ -30,9 +30,9 @@ function Nav() {
   return (
     <>
     <NavLayout>
-        <Logos onClick={onClickHome}>
-            <img src={Logo} alt="logo" style={{cursor: "pointer"}}/>
-            <img src={Logo2} alt="iterview" style={{cursor: "pointer"}}/>
+        <Logos>
+            <img src={Logo} alt="logo" style={{cursor: "pointer"}} onClick={onClickHome}/>
+            <img src={Logo2} alt="iterview" style={{cursor: "pointer"}} onClick={onClickHome}/>
             <DropdownContainer>
               <DropdownSelect style={{marginLeft: "14px"}} onClick={selectHandler} ref={selectRef}>
               <TextStyle>직무선택</TextStyle>
