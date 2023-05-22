@@ -4,6 +4,8 @@ import Home from './Home';
 import Login from './Login';
 import Signup from './Signup';
 import Select from './Select';
+import Question from './Question';
+// import Test from './Test';
 
 
 function Router() {
@@ -14,6 +16,8 @@ function Router() {
        <Route path='/login' element={<Login />} />
        <Route path='/signup' element={<Signup />} />
        <Route path='/select' element={<Select />} />
+       <Route path='/question' element={<Question />} />
+       {/* <Route path='/test' element={<Test />} /> */}
      </Routes>
     </BrowserRouter>
   )

@@ -2,16 +2,19 @@ import React, {useState} from 'react'
 import { styled } from 'styled-components';
 import colors from '../../style/color';
 
-function QuestionToggle() {
+function QuestionToggle(props) {
     const [selectSort, setSelectSort] = useState(true);
 
     const toggledHandler = () => {
         setSelectSort((prev) => !prev);
     }
+    const sendIsChoose = () => {
+        props.getIsChoose(!selectSort);
+    }
     return (
         <BtnWrapper>
             <CheckBox type="checkbox" id="toggleBtn" onChange={toggledHandler} />
-            <ButtonLabel htmlFor="toggleBtn" selectSort={selectSort} />
+            <ButtonLabel htmlFor="toggleBtn" selectSort={selectSort} onClick={sendIsChoose} />
         </BtnWrapper>
     )
 }
@@ -22,7 +25,6 @@ const BtnWrapper = styled.div`
     display: flex;
     z-index: 0;
     margin-top: 54.38px;
-    margin-bottom: 50px;
 `
 const CheckBox = styled.input`
     display: none;
