@@ -8,6 +8,7 @@ import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import Bookmarkoff from '../../assets/svg/bookmark/bookmarkoff.svg';
 import Bookmarkon from '../../assets/svg/bookmark/bookmarkon.svg';
 import Tag from '../toggle/tag/tag';
+import { keyframes } from 'styled-components';
 
 function QuestionBtn(props) {
     const parentRef = useRef(null);
@@ -41,21 +42,34 @@ function QuestionBtn(props) {
     <Container>
         <Header onClick={handleClick}>
             {visibleAll ?
-                <div style={{display:"flex", width:"1014px", height:"fit-content",}}>
-                <QImgStyle src={QImg} />
-                    <div style={{}}>
-                        {data[0].questions[0].question}
-                    </div>
+            <>
+              <div style={{display:"flex", width:"1014px", height:"fit-content", marginRight:"5px"}}>
+              <QImgStyle src={QImg} />
+                  <div style={{}}>
+                      {data[0].questions[0].question}
+                  </div>
+              </div>
+              <Icon>
+                <div>
+                  <FontAwesomeIcon icon={faAngleDown}/>
                 </div>
+              </Icon>       
+            </>
             :
-                <div style={{display:"flex", width:"1014px"}}>
-                <QImgStyle src={QImg} />
-                    <div style={{display:"block", textOverflow:"ellipsis", overflow:"hidden", whiteSpace:"nowrap"}}>
-                        {data[0].questions[0].question}
-                    </div>
+            <>
+              <HeaderDiv>
+              <QImgStyle src={QImg} />
+                  <div style={{display:"block", textOverflow:"ellipsis", overflow:"hidden", whiteSpace:"nowrap"}}>
+                      {data[0].questions[0].question}
+                  </div>
+              </HeaderDiv>
+              <Icon2>
+                <div>
+                  <FontAwesomeIcon icon={faAngleDown}/>
                 </div>
+              </Icon2>    
+            </>
             }
-            <FontAwesomeIcon icon={faAngleDown} style={{marginRight:"26px", color:"#89898A", marginBottom:"6px"}}/>
         </Header>
         <ContentsWrapper ref={parentRef}>
             <Contents ref={childRef}>
@@ -84,7 +98,6 @@ const Container = styled.div`
 `
 const Header = styled.div`
     display: flex;
-    align-items: center;
     height: fit-content;
     font-weight: 700;
     font-size: 22px;
@@ -107,7 +120,6 @@ const QImgStyle = styled.img`
   margin-left: 30px;
   margin-right: 15.4px;
   padding-bottom: 10px;
-
 `
 const ContentsWrapper = styled.div`
     height: 0;
@@ -132,4 +144,42 @@ const TagList = styled.div`
     margin-left: 76px;
     margin-top: 12px;
     margin-bottom: 24px;
+`
+const HeaderDiv = styled.div`
+    display: flex;
+    width: 1014px;
+
+    @media screen and (max-width: 1000px) {
+        width: 700px;  
+    }
+`
+const AniUp = keyframes`
+  0% {
+    transform:rotate(0deg);
+  }
+  100%{
+    transform:rotate(180deg);
+  }
+`
+const AniDown = keyframes`
+  0% {
+    transform:rotate(180deg);
+  }
+  100%{
+    transform:rotate(0deg);
+  }
+`
+const Icon = styled.div`
+    margin-right: 26px;
+    color: #89898A;
+    margin-bottom: 90px;
+
+    animation: ${AniUp} 0.1s linear forwards;
+`
+const Icon2 = styled.div`
+    margin-right: 26px;
+    color: #89898A;
+    margin-bottom: 6px;
+
+    animation: ${AniDown} 0.1s linear forwards;
 `
