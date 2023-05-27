@@ -5,7 +5,7 @@ import Login from './Login';
 import Signup from './Signup';
 import Select from './Select';
 import Question from './Question';
-// import Test from './Test';
+import Test from './Test';
 
 
 function Router() {
@@ -17,7 +17,7 @@ function Router() {
        <Route path='/signup' element={<Signup />} />
        <Route path='/select' element={<Select />} />
        <Route path='/question' element={<Question />} />
-       {/* <Route path='/test' element={<Test />} /> */}
+       <Route path='/interview' element={<Test />} />
      </Routes>
     </BrowserRouter>
   )
