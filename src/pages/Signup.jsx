@@ -5,30 +5,64 @@ import SignUpImg from '../assets/svg/JOIN.svg'
 import colors from '../style/color';
 import { styled } from 'styled-components';
 import Footer from '../components/footer/Footer';
+import { useRecoilState } from 'recoil';
+import { UserState } from '../recoil/userState';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function Signup() {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [account, setAccount] = useState('');
+  const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
-  // const [user, setUser] = useRecoilState(userState);
+//   const [user, setUser] = useRecoilState(UserState);
 
-  const Btndisabled = username && email && (password === passwordConfirm);
+  const navigate = useNavigate();
+
+  const onAccount = (e) => {
+    setAccount(e.target.value);
+  }
+
+  const onPassword = (e) => {
+    setPassword(e.target.value);
+  }
+
+  const onHandleSubmit = (e) => {
+    e.preventDefault();
+    axios
+        .post('http://15.165.104.225/signup', {
+              account: account,
+              password: password,
+        })
+        .then((res) => {
+            console.log(res);
+            if(res.data.status === 40106) {
+                alert("이미 사용중인 계정입니다.");
+            }
+            if(res.data.status === 20100) {
+                alert("회원가입 성공!");
+                navigate("/login");
+            }
+        })
+        .catch((err) => {
+            console.log(err);
+            alert("회원가입 실패");
+        })
+  }
+
+  const Btndisabled = account && (password === passwordConfirm);
 
   return (
     <>
     <Nav />
-    <FormStyle>
+    <FormStyle onSubmit={onHandleSubmit}>
       <JoinImg src={SignUpImg} alt='login' />
           <LoginEmailBoxLayout>
             <div>아이디</div>
               <PlaceholderStyle
                   placeholder='아이디를 입력해 주세요.'
                   type='text'
-                  value={username}
-                  onChange={(e) => {
-                      setUsername(e.target.value);
-                  }}
+                  value={account}
+                  onChange={onAccount}
               />
           </LoginEmailBoxLayout>
             <LoginPasswordBoxLayout>
@@ -37,9 +71,7 @@ function Signup() {
                     placeholder='비밀번호를 입력해 주세요.'
                     type="password"
                     value={password}
-                    onChange={(e) => {
-                        setPassword(e.target.value);
-                    }}
+                    onChange={onPassword}
                 />
             </LoginPasswordBoxLayout>
             <LoginPasswordBoxLayout>
