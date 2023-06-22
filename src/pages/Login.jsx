@@ -6,12 +6,15 @@ import colors from '../style/color';
 import LoginS from '../assets/svg/LOGIN.svg';
 import { useNavigate } from 'react-router-dom';
 import Footer from '../components/footer/Footer';
+import { useRecoilState } from 'recoil';
+import { UserState } from '../recoil/userState';
+import axios from 'axios';
 
 
 function Login() {
-  const [email, setEmail] = useState("");
+  const [account, setAccount] = useState("");
   const [password, setPassword] = useState("");
-  // const [user, setUser] = useRecoilState(userState);
+  const [user, setUser] = useRecoilState(UserState);
 
   const navigate = useNavigate();
 
@@ -19,22 +22,53 @@ function Login() {
     navigate('/signup');
   }
 
-  const btndisabled = email && password;
+  const onAccount = (e) => {
+    setAccount(e.target.value);
+  }
+
+  const onPassword = (e) => {
+    setPassword(e.target.value);
+  }
+
+  const onHandleSubmit = (e) => {
+    e.preventDefault();
+    axios
+        .post('http://15.165.104.225/login', {
+              account: account,
+              password: password,
+        })
+        .then((res) => {
+            console.log(res);
+            setUser({
+                account: res.data.data.account,
+                accessToken : res.data.data.token.access_token,
+                refreshToken : res.data.data.token.refresh_token,
+            })
+            localStorage.setItem('accessToken', res.data.data.token.access_token);
+            localStorage.setItem('refreshToken', res.data.data.token.refresh_token);
+            alert('로그인 성공!');
+            navigate('/');
+        })
+        .catch((err) => {
+          console.log(err);
+          alert('사용자를 찾을 수 없습니다.');
+        })
+  }
+
+  const btndisabled = account && password;
 
   return (
     <>
     <Nav />
-    <FormStyle>
+    <FormStyle onSubmit={onHandleSubmit}>
       <LoginImg src={LoginS} alt='login' />
       <LoginEmailBoxLayout>
                 <div>아이디</div>
                 <PlaceholderStyle
                     placeholder='아이디를 입력해 주세요.'
                     type="text"
-                    value={email}
-                    onChange={(e) => {
-                        setEmail(e.target.value);
-                    }}
+                    value={account}
+                    onChange={onAccount}
                 />
             </LoginEmailBoxLayout>
             <LoginPasswordBoxLayout>
@@ -43,9 +77,7 @@ function Login() {
                     placeholder='비밀번호를 입력해 주세요.'
                     type="password"
                     value={password}
-                    onChange={(e) => {
-                        setPassword(e.target.value);
-                    }}
+                    onChange={onPassword}
                 />
             </LoginPasswordBoxLayout>
             <Button type='submit' disabled={btndisabled ? false : true}>로그인</Button>
