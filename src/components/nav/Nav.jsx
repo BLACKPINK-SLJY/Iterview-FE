@@ -2,17 +2,21 @@ import React, {useEffect, useRef, useState} from 'react'
 import { Logos, NavLayout, SignButtonLayout, SignUpButton, LoginButton, SearchNickLayout } from './style'
 import Logo from "../../assets/svg/Logo.svg"
 import Logo2 from "../../assets/svg/Logo_2.svg"
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import SearchBar from '../searchBar/Searchbar';
 import { css, styled } from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import useDetectClose from './useDetectClose';
 import colors from '../../style/color';
+import { useRecoilState } from 'recoil';
+import { UserState } from '../../recoil/userState';
+import { axios } from 'axios';
 
 function Nav() {
-  const [selectIsOpen, selectRef, selectHandler] = useDetectClose(false)
+  const [selectIsOpen, selectRef, selectHandler] = useDetectClose(false);
   const [myPageIsOpen, myPageRef, myPageHandler] = useDetectClose(false);
+  const [user, setUser] = useRecoilState(UserState);
   const navigate = useNavigate();
 
   const onClickLogin = () => {
@@ -27,59 +31,70 @@ function Nav() {
     navigate("/");
   }
 
+  const handleLogout = () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    setUser(undefined);
+  }
+
   return (
     <>
     <NavLayout>
         <Logos>
             <img src={Logo} alt="logo" style={{cursor: "pointer"}} onClick={onClickHome}/>
             <img src={Logo2} alt="iterview" style={{cursor: "pointer"}} onClick={onClickHome}/>
-            <DropdownContainer>
-              <DropdownSelect style={{marginLeft: "14px"}} onClick={selectHandler} ref={selectRef}>
-              <TextStyle>직무선택</TextStyle>
-              <FontAwesomeIcon icon={faAngleDown} style={{color:"white", paddingTop:"13px"}} />
-              </DropdownSelect>
-              <DropDownMenu isDropped={selectIsOpen}>
-                <Ul>
-                  <li>
-                    <LinkWrapper href="#1-1">Frontend</LinkWrapper>
-                  </li>
-                  <li>
-                    <LinkWrapper href="#1-2">Backend</LinkWrapper>
-                  </li>
-                  <li>
-                    <LinkWrapper href="#1-4">Android</LinkWrapper>
-                  </li>
-                  <li>
-                    <LinkWrapper href="#1-5">ios</LinkWrapper>
-                  </li>
-                </Ul>
-              </DropDownMenu>
+            {user && 
+              <DropdownContainer>
+                <DropdownSelect style={{marginLeft: "14px"}} onClick={selectHandler} ref={selectRef}>
+                <TextStyle>직무선택</TextStyle>
+                <FontAwesomeIcon icon={faAngleDown} style={{color:"white", paddingTop:"13px"}} />
+                </DropdownSelect>
+                <DropDownMenu isDropped={selectIsOpen}>
+                  <Ul>
+                    <LinkWrapper>
+                      <Link to='/question'>Frontend</Link>
+                    </LinkWrapper>
+                    <LinkWrapper>
+                      <Link to='/question'>Backend</Link>
+                    </LinkWrapper>
+                    <LinkWrapper>
+                      <Link to='/question'>Android</Link>
+                    </LinkWrapper>
+                    <LinkWrapper>
+                      <Link to='/question'>ios</Link>
+                    </LinkWrapper>
+                  </Ul>
+                </DropDownMenu>
               </DropdownContainer>
+            }
         </Logos>
-        {/* <SignButtonLayout>
+        {user ?
+            <SearchNickLayout>
+              <SearchBar />
+              <DropdownContainer>
+                <DropdownSelect onClick={myPageHandler} ref={myPageRef}>
+                  <TextStyle>{user.account}<SpanStyle>님</SpanStyle>
+                  <FontAwesomeIcon icon={faAngleDown} style={{color:"white", marginLeft: "7px"}} />
+                  </TextStyle>      
+                </DropdownSelect>
+                <DropDownMenu2 isDropped={myPageIsOpen}>
+                  <Ul>
+                    <LinkWrapper>
+                      <Link to='/mypage'>My Page</Link>
+                    </LinkWrapper>
+                    <LinkWrapper>
+                      <Link to='/' onClick={handleLogout}>Log Out</Link>
+                    </LinkWrapper>
+                  </Ul>
+                </DropDownMenu2>
+              </DropdownContainer>
+            </SearchNickLayout>
+          :
+          <SignButtonLayout>
             <SignUpButton onClick={onClickSignup}>회원가입</SignUpButton>
             <LoginButton onClick={onClickLogin}>로그인</LoginButton>
-        </SignButtonLayout> */}
-        <SearchNickLayout>
-        <SearchBar />
-        <DropdownContainer>
-          <DropdownSelect onClick={myPageHandler} ref={myPageRef}>
-            <TextStyle>유민진<SpanStyle>님</SpanStyle>
-            <FontAwesomeIcon icon={faAngleDown} style={{color:"white", marginLeft: "7px"}} />
-            </TextStyle>      
-          </DropdownSelect>
-          <DropDownMenu2 isDropped={myPageIsOpen}>
-            <Ul>
-              <li>
-              <LinkWrapper href="#1-1">My Page</LinkWrapper>
-              </li>
-              <li>
-              <LinkWrapper href="#1-2">Log Out</LinkWrapper>
-              </li>
-            </Ul>
-          </DropDownMenu2>
-        </DropdownContainer>
-        </SearchNickLayout>
+          </SignButtonLayout>
+        }
     </NavLayout>
     </>
   )
@@ -155,7 +170,7 @@ const DropDownMenu2 = styled.div`
       left: 50%;
     `};
 `
-const LinkWrapper = styled.a`
+const LinkWrapper = styled.li`
   font-weight: 500;
   font-size: 18.4932px;
   line-height: 27px;
