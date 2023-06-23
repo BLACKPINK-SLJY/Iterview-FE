@@ -11,19 +11,19 @@ function DropDownBtn() {
     <>
         <DropdownContainer>
             <DropDownSelect onClick={selectHandler} ref={selectRef}>
-                <div style={{paddingTop:"3px"}}>난이도 순</div>
+                <div style={{paddingTop:"3px"}}>난이도 낮은 순</div>
                 <FontAwesomeIcon icon={faAngleDown} style={{paddingTop:"10px"}}/>
             </DropDownSelect>
             <DropDownMenu isDropped={selectIsOpen}>
                 <Ul>
                     <li>
-                        <LinkWrapper href="#1-1">난이도 순</LinkWrapper>
+                        <LinkWrapper href="#1-1">난이도 낮은 순</LinkWrapper>
+                    </li>
+                    <li>
+                        <LinkWrapper href="#1-1">난이도 높은 순</LinkWrapper>
                     </li>
                     <li>
                         <LinkWrapper href="#1-2">인기 순</LinkWrapper>
-                    </li>
-                    <li>
-                        <LinkWrapper href="#1-2">북마크</LinkWrapper>
                     </li>
                 </Ul>
             </DropDownMenu>
@@ -40,7 +40,7 @@ const DropdownContainer = styled.div`
   display: inline-block;
 `
 const DropDownSelect = styled.div`
-    width: 120px;
+    width: 130px;
     height: 36px;
     display: flex;
     gap: 6px;
@@ -59,7 +59,7 @@ const DropDownMenu = styled.div`
   position: absolute;
   top: 60px;
   left: 50%;
-  width: 120px;
+  width: 130px;
   height: 114px;
   text-align: center;
   opacity: 0;
@@ -85,7 +85,7 @@ const Ul = styled.ul`
   & > li {
     padding-top: 4px;
     padding-bottom: 4px;
-    width: 120px;
+    width: 130px;
   }
   list-style-type: none;
   display: flex;
