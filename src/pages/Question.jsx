@@ -1,21 +1,72 @@
 import React, {useState} from 'react'
-import data from '../data/data'
 import Nav from '../components/nav/Nav';
 import Footer from '../components/footer/Footer';
 import { styled } from 'styled-components';
 import colors from '../style/color';
 import QuestionToggle from '../components/toggle/QuestionToggle';
 import DropDownBtn from '../components/toggle/DropDownBtn';
-import SelectBtn from '../components/toggle/SelectBtn';
 import QuestionBtn from '../components/questionBtn/questionBtn';
+import Dice from '../assets/svg/dice.svg';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useRecoilState } from 'recoil';
+import { ClickedState, QuestionState } from '../recoil/QuestionState';
+import instance from '../instance/instance';
+import axios from 'axios';
 
 function Question() {
-    const [ischoose, setIsChoose] = useState(false);
+    const {category} = useParams();
+    const [ischoose, setIsChoose] = useState(true);
     const [isSelect, setIsSelect] = useState(false);
+    const [questions, setQuestions] = useRecoilState(QuestionState);
+    // const [selectedQuestion, setSelectedQuestion] = useRecoilState(QuestionState);
+    const navigate = useNavigate();
+
+    const [selectedQuestionIds, setSelectedQuestionIds] = useRecoilState(ClickedState);
+
+    const handleQuestionClick = (questionId) => {
+      setSelectedQuestionIds((prevIds) => {
+        if (prevIds.includes(questionId)) {
+            prevIds = prevIds.filter((id) => id !== questionId);
+        } else {
+            prevIds = [...prevIds, questionId];
+        }
+        return prevIds;
+      });
+    };
     
     const getIsChoose = (text) => {
         setIsChoose(text);
     }
+    
+    useEffect(() => {
+        axios
+            .get('http://15.165.104.225/question/list', {
+                headers: {
+                Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+                },
+                params: {
+                category: category,
+                }
+            })
+            .then((res) => {
+                console.log(res);
+                setQuestions(res.data.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+    }, [category]);
+
+    useEffect(() => {
+        console.log(selectedQuestionIds);
+      }, [selectedQuestionIds]);
+
+      useEffect(() => {
+          setSelectedQuestionIds([]);
+        console.log(selectedQuestionIds);
+      }, [ischoose]);
+
   return (
     <>
     <Nav />
@@ -25,20 +76,25 @@ function Question() {
             :
             <GraText>RANDOM TEST</GraText>
         }
-        <CategoryText>{data[0].category}</CategoryText>
+        <CategoryText>{questions.category}</CategoryText>
         <TextStyle2>질문을 선택해 질문에 대한 답을 준비해보세요.<br/>동영상 녹화를 통해 면접 영상을 확인할 수 있습니다.</TextStyle2>
         <BtnFlex>
         <QuestionToggle getIsChoose={getIsChoose} />
         <div style={{display: "flex", gap:"16px", alignItems: "end"}}>
+        {ischoose ?
         <DropDownBtn />
-        {ischoose &&
-             <SelectBtn />
+        :
+        <RandomTestBtn><img src={Dice} alt='주사위' style={{marginRight: '6px'}}/>랜덤</RandomTestBtn>
         }
         </div>
         </BtnFlex>
-        <QuestionBtn />
+        <QuestionBtn contents={questions} ischoose={ischoose} handleQuestionClick={handleQuestionClick} selectedQuestionIds={selectedQuestionIds}/>
         <br/>
-        <GoTestBtn disabled={true}>면접 보러 가기</GoTestBtn>
+        {ischoose ?
+        <GoTestBtn disabled={selectedQuestionIds.length === 0} onClick={() => navigate('/interview')}>면접 보기 ({selectedQuestionIds.length})</GoTestBtn>
+        :
+        <GoTestBtn disabled={false} onClick={() => navigate('/interview')}>면접 보기</GoTestBtn>
+        }
     </Container>
     <Footer />
     </>
@@ -92,7 +148,7 @@ const BtnFlex = styled.div`
 const GoTestBtn = styled.button`
     border: none;
     z-index: 2;
-    width: 220px;
+    width: 190px;
     height: 62px;
     position: fixed;
     left: calc(50% - 194.35px/2 - 0.33px);
@@ -100,13 +156,29 @@ const GoTestBtn = styled.button`
     box-shadow: 0px 0px 9.20818px rgba(0, 0, 0, 0.1);
     border-radius: 34.9911px;
     background: linear-gradient(135.86deg, #9E3DFF 0%, #3840FF 100%);
+    cursor: pointer;
 
     color: ${colors.white_100};
     font-size: 22px;
     line-height: 27px;
     letter-spacing: 0.05em;
+    font-weight: 700;
 
-    :disabled {
+    &:disabled {
         background: ${colors.black_20};
+        cursor: not-allowed;
     }
+`
+const RandomTestBtn = styled.button`
+    padding-top: 4px;
+    width: 90px;
+    height: 36px;
+    font-size: 16px;
+    border: none;
+    background-color: ${colors.white_100};
+    font-weight: 700;
+    line-height: 200.2%;
+    color: ${colors.black_90};
+    filter: drop-shadow(0px 0px 9.14454px rgba(0, 0, 0, 0.1));
+    border-radius: 4.24669px;
 `

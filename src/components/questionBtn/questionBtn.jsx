@@ -1,86 +1,75 @@
-import React, {useCallback, useRef, useState} from 'react'
+import React, {useCallback, useRef, useState, useEffect} from 'react'
 import { styled } from 'styled-components';
 import colors from '../../style/color';
-import data from '../../data/data';
 import QImg from '../../assets/svg/Q.svg';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import Bookmarkoff from '../../assets/svg/bookmark/bookmarkoff.svg';
-import Bookmarkon from '../../assets/svg/bookmark/bookmarkon.svg';
+// import Bookmarkon from '../../assets/svg/bookmark/bookmarkon.svg';
 import Tag from '../toggle/tag/tag';
-import { keyframes } from 'styled-components';
+import LevelTag from '../toggle/tag/LevelTag';
 
 function QuestionBtn(props) {
-    const parentRef = useRef(null);
-    const childRef = useRef(null);
+  const [isClicked, setIsClicked] = useState([]);
+  const { ischoose, contents, handleQuestionClick, selectedQuestionIds } = props;
 
-    const [isCollapse, setIsCollapse] = useState(false);
-    const [visibleAll, setVisibleAll] = useState(false);
+const handleClick = (questionId) => {
+    const isSelected = isClicked.includes(questionId);
 
-    const handleClick = useCallback(
-        (event) => {
-          setVisibleAll(!visibleAll);
-          event.stopPropagation();
-          if (parentRef.current === null || childRef.current === null) {
-            return;
-          }
-          if (parentRef.current.clientHeight > 0) {
-            parentRef.current.style.height = "0";
-            parentRef.current.style.background = "white";
-          } else {
-            parentRef.current.style.height = `${childRef.current.clientHeight}px`;
-            parentRef.current.style.background = "#F5F5F7";
-          }
-          setIsCollapse(!isCollapse);
-        },
-        [isCollapse]
-      );
+    if (isSelected) {
+        setIsClicked(isClicked.filter((id) => id !== questionId));
+    }
+    else {
+        setIsClicked([...isClicked, questionId]);
+    }
+  }
 
-      const parentRefHeight = parentRef.current?.style.height ?? "0px";
+//   useEffect(() => {
+//     console.log(isClicked);
+//   }, [isClicked]);
 
   return (
-    <Container>
-        <Header onClick={handleClick}>
-            {visibleAll ?
-            <>
-              <div style={{display:"flex", width:"1014px", height:"fit-content", marginRight:"5px"}}>
-              <QImgStyle src={QImg} />
-                  <div style={{}}>
-                      {data[0].questions[0].question}
-                  </div>
-              </div>
-              <Icon>
-                <div>
-                  <FontAwesomeIcon icon={faAngleDown}/>
+    <>
+    {ischoose ?
+        contents && contents.map((question) => (
+            <Container key={question.questionId} isClicked={selectedQuestionIds.includes(question.questionId)}>
+            <Header onClick={() => handleQuestionClick(question.questionId)}>
+                  <div style={{display:"flex", width:"1050px", height:"fit-content", marginRight:"5px"}}>
+                  <QImgStyle src={QImg} />
+                      <div style={{}}>
+                          {/* {data[0].questions[0].question} */}
+                          {question.content}
+                      </div>
+                  </div>    
+            </Header>
+                <Contents>
+                    <TagList>
+                        <LevelTag question={question}/>
+                        <Tag question={question}/>
+                    </TagList>
+                    <ScrapImg src={Bookmarkoff} alt="bookmark" />
+                </Contents>
+            </Container>
+        ))
+      :
+      contents.map((question) => (
+      <Container key={question.questionId}>
+      <Header>
+            <div style={{display:"flex", width:"1050px", height:"fit-content", marginRight:"5px"}}>
+            <QImgStyle src={QImg} />
+                <div style={{}}>
+                    {question.content}
                 </div>
-              </Icon>       
-            </>
-            :
-            <>
-              <HeaderDiv>
-              <QImgStyle src={QImg} />
-                  <div style={{display:"block", textOverflow:"ellipsis", overflow:"hidden", whiteSpace:"nowrap"}}>
-                      {data[0].questions[0].question}
-                  </div>
-              </HeaderDiv>
-              <Icon2>
-                <div>
-                  <FontAwesomeIcon icon={faAngleDown}/>
-                </div>
-              </Icon2>    
-            </>
-            }
-        </Header>
-        <ContentsWrapper ref={parentRef}>
-            <Contents ref={childRef}>
-                {props.contents}
-                <TagList>
-                    <Tag />
-                </TagList>
-                <ScrapImg src={Bookmarkoff} alt="bookmark" />
-            </Contents>
-        </ContentsWrapper>
-    </Container>
+            </div>    
+      </Header>
+          <Contents>
+              <TagList>
+              <LevelTag question={question}/>
+              <Tag question={question}/>
+              </TagList>
+              <ScrapImg src={Bookmarkoff} alt="bookmark" />
+          </Contents>
+      </Container>
+      ))}
+    </>
   )
 }
 
@@ -91,7 +80,7 @@ const Container = styled.div`
     position: relative;
     flex-direction: column;
     justify-content: center;
-    background-color: ${colors.white_100};
+    background-color: ${props => (props.isClicked ? colors.lightBlue : colors.white_100)};
     box-shadow: 0px 0px 9.14454px rgba(0, 0, 0, 0.1);
     border-radius: 14.1556px;
     margin-top: 20px;
@@ -107,6 +96,9 @@ const Header = styled.div`
     padding-top: 20px;
     padding-bottom: 14px;
     cursor: pointer;
+    @media screen and (max-width: 1000px) {
+        width: 750px;  
+    }
 `
 const ScrapImg = styled.img`
     width: 46px;
@@ -121,21 +113,10 @@ const QImgStyle = styled.img`
   margin-right: 15.4px;
   padding-bottom: 10px;
 `
-const ContentsWrapper = styled.div`
-    height: 0;
-    width: 100%;
-    overflow: hidden;
-    transition: height 0.1s ease;
-`
 const Contents = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.1px;
-  height: fit-content;
-  border-radius: 0 0 14.1556px 14.1556px;
-  background-color: ${colors.white_100};
-  box-shadow: 0px 0px 9.14454px rgba(0, 0, 0, 0.1);
 `
 const TagList = styled.div`
     display: flex;
@@ -144,42 +125,4 @@ const TagList = styled.div`
     margin-left: 76px;
     margin-top: 12px;
     margin-bottom: 24px;
-`
-const HeaderDiv = styled.div`
-    display: flex;
-    width: 1014px;
-
-    @media screen and (max-width: 1000px) {
-        width: 700px;  
-    }
-`
-const AniUp = keyframes`
-  0% {
-    transform:rotate(0deg);
-  }
-  100%{
-    transform:rotate(180deg);
-  }
-`
-const AniDown = keyframes`
-  0% {
-    transform:rotate(180deg);
-  }
-  100%{
-    transform:rotate(0deg);
-  }
-`
-const Icon = styled.div`
-    margin-right: 26px;
-    color: #89898A;
-    margin-bottom: 90px;
-
-    animation: ${AniUp} 0.1s linear forwards;
-`
-const Icon2 = styled.div`
-    margin-right: 26px;
-    color: #89898A;
-    margin-bottom: 6px;
-
-    animation: ${AniDown} 0.1s linear forwards;
 `

@@ -1,13 +1,19 @@
 import React from 'react'
 import { styled } from 'styled-components';
 import colors from '../../../style/color';
-import data from '../../../data/data';
 
-function Tag() {
+function Tag(props) {
+  const { question } = props;
+
   return (
-    <Container>
-        #{data[0].questions[0].level}
-    </Container>
+    <>
+    {
+    question.tags.map((tag) => (
+      <Container key={tag}>
+        #{tag}
+      </Container>
+    ))}
+    </>
   )
 }
 
