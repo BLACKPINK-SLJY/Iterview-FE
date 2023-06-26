@@ -12,12 +12,25 @@ import GAND from "../assets/svg/GraAND.svg";
 import GIOS from "../assets/svg/GraIOS.svg";
 import Nav from '../components/nav/Nav';
 import Footer from '../components/footer/Footer';
+import { axios } from 'axios';
+import { useRecoilState } from 'recoil';
+import { UserState } from '../recoil/userState';
+import { useParams, useNavigate } from 'react-router-dom';
 
 function Select() {
     const [onHover, setOnHover] = useState(0);
     const [onHover2, setOnHover2] = useState(0);
     const [onHover3, setOnHover3] = useState(0);
     const [onHover4, setOnHover4] = useState(0);
+    // const { category } = useParams();
+    const navigate = useNavigate();
+
+    const [selectedCategory, setSelectedCategory] = useState('');
+
+    const handleCategorySelect = (category) => {
+      setSelectedCategory(category);
+      navigate(`/question/${category}`);
+    };
 
   return (
     <>
@@ -29,8 +42,8 @@ function Select() {
         onMouseOut={()=>setOnHover(0)}
       >
       {onHover ? (
-          <SelecBtn><img src={GFE} alt="gfe"></img><br/><GraText>Frontend</GraText></SelecBtn>
-      ) : <SelecBtn><img src={FE} alt="fe"></img><br/>Frontend</SelecBtn>
+          <SelecBtn onClick={() => handleCategorySelect('fe')}><img src={GFE} alt="gfe"></img><br/><GraText>Frontend</GraText></SelecBtn>
+      ) : <SelecBtn onClick={() => handleCategorySelect('fe')}><img src={FE} alt="fe"></img><br/>Frontend</SelecBtn>
       }
       </div>
       <div 
@@ -38,8 +51,8 @@ function Select() {
         onMouseOut={()=>setOnHover2(0)}
       >
       {onHover2 ? (
-          <SelecBtn><img src={GBE} alt="gbe"></img><br/><GraText>Backend</GraText></SelecBtn>
-      ) : <SelecBtn><img src={BE} alt="be"></img><br/>Backend</SelecBtn>
+          <SelecBtn  onClick={() => handleCategorySelect('be')}><img src={GBE} alt="gbe"></img><br/><GraText>Backend</GraText></SelecBtn>
+      ) : <SelecBtn onClick={() => handleCategorySelect('be')}><img src={BE} alt="be"></img><br/>Backend</SelecBtn>
       }
       </div>
       <div 
@@ -47,8 +60,8 @@ function Select() {
         onMouseOut={()=>setOnHover3(0)}
       >
       {onHover3 ? (
-          <SelecBtn><img src={GAND} alt="gandroid"></img><br/><GraText>Android</GraText></SelecBtn>
-      ) : <SelecBtn><img src={AND} alt="android"></img><br/>Android</SelecBtn>
+          <SelecBtn onClick={() => handleCategorySelect('aos')}><img src={GAND} alt="gandroid"></img><br/><GraText>Android</GraText></SelecBtn>
+      ) : <SelecBtn onClick={() => handleCategorySelect('aos')}><img src={AND} alt="android"></img><br/>Android</SelecBtn>
       }
       </div>
       <div 
@@ -56,8 +69,8 @@ function Select() {
         onMouseOut={()=>setOnHover4(0)}
       >
       {onHover4 ? (
-          <SelecBtn><img src={GIOS} alt="gios"></img><br/><GraText>ios</GraText></SelecBtn>
-      ) : <SelecBtn><img src={IOS} alt="ios"></img><br/>ios</SelecBtn>
+          <SelecBtn onClick={() => handleCategorySelect('ios')}><img src={GIOS} alt="gios"></img><br/><GraText>ios</GraText></SelecBtn>
+      ) : <SelecBtn onClick={() => handleCategorySelect('ios')}><img src={IOS} alt="ios"></img><br/>ios</SelecBtn>
       }
       </div>
     </SelectGrid>

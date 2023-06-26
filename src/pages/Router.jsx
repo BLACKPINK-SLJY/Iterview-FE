@@ -6,6 +6,7 @@ import Signup from './Signup';
 import Select from './Select';
 import Question from './Question';
 import Test from './Test';
+import Mypage from './Mypage';
 
 
 function Router() {
@@ -16,8 +17,9 @@ function Router() {
        <Route path='/login' element={<Login />} />
        <Route path='/signup' element={<Signup />} />
        <Route path='/select' element={<Select />} />
-       <Route path='/question' element={<Question />} />
+       <Route path='/question/:category' element={<Question />} />
        <Route path='/interview' element={<Test />} />
+       <Route path='/mypage' element={<Mypage />} />
      </Routes>
     </BrowserRouter>
   )
