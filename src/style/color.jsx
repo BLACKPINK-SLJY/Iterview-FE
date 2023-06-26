@@ -13,6 +13,7 @@ const colors = {
     bgColor: "#F5F5F7",
     pointColor_1: "#9E3DFF",
     pointColor_2: "#3840FF",
+    lightBlue: "#EDF0FF",
 };
 
 export default colors;

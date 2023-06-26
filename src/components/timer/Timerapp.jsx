@@ -42,11 +42,11 @@ export default Timerapp
 const Container = styled.div`
   text-align: center;
   position: absolute;
-  top: 60%;
+  top: 600px;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 10;
   @media screen and (max-width: 1000px) {
-       top: 55%;
+       top: 550px;
   }
 `

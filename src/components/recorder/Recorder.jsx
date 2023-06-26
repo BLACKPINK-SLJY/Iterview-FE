@@ -52,9 +52,9 @@ export default function Recorder(props) {
     if (running) {
       intervalId = setInterval(() => {
         setIsMinute((prevMinute) => prevMinute + 1);
+        console.log(isminute);
       }, 10000);
     }
-    console.log(isminute);
     return () => {
       clearInterval(intervalId);
     };
@@ -100,11 +100,19 @@ export default function Recorder(props) {
   }
 
   const onClickRecordStart = () => {
+    if (
+      recordWebcam.status === "CLOSED" ||
+      recordWebcam.status === "RECORDING" ||
+      recordWebcam.status === "PREVIEW"
+    ) {
+      return;
+    }
+
     recordWebcam.start();
     startTime();
     setTimeout(() => {
       setAlert(true);
-    }, 5000);
+    }, 10000);
   }
 
   const onClickRecordStop = () => {
@@ -262,7 +270,7 @@ const RecorderBtnStyle = styled.button`
 
   :disabled {
     opacity: 20%;
-    cursor: default;
+    cursor: not-allowed;
   }
 `
 const BtnLayout = styled.div`
@@ -296,7 +304,7 @@ const Blinkanimation = styled.div`
 
   :disabled {
     opacity: 20%;
-    cursor: default;
+    cursor: not-allowed;
   }
 
   animation: ${blink} 1s step-end infinite;;
@@ -322,7 +330,7 @@ const VideoDiv = styled.div`
 const AlertContainer = styled.div`
   text-align: center;
   position: absolute;
-  top: 43%;
+  top: 400px;
   left: 50%;
   transform: translate(-50%, -50%);
   padding-top: 10px;
@@ -332,7 +340,7 @@ const AlertContainer = styled.div`
   line-height: 21px;
   letter-spacing: 0.0025em;
   @media screen and (max-width: 1000px) {
-       top: 45%;
+       top: 400px;
   }
 
   color: white;
