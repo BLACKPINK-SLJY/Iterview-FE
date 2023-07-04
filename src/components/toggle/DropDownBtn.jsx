@@ -4,26 +4,38 @@ import colors from '../../style/color';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import useDetectClose from '../nav/useDetectClose';
+import { axios } from 'axios';
+import { useRecoilState } from 'recoil';
+import { UserState } from '../../recoil/userState';
+import { useState } from 'react';
 
-function DropDownBtn() {
-    const [selectIsOpen, selectRef, selectHandler] = useDetectClose(false)
+function DropDownBtn({handleDropDown}) {
+    const [selectIsOpen, selectRef, selectHandler] = useDetectClose(false);
+    const [title, setTitle] = useState('난이도 낮은 순');
+
+    const handleLi = (selectedValue) => {
+      handleDropDown(selectedValue);
+      setTitle(selectedValue);
+    }
+
+
   return (
     <>
         <DropdownContainer>
             <DropDownSelect onClick={selectHandler} ref={selectRef}>
-                <div style={{paddingTop:"3px"}}>난이도 낮은 순</div>
+                <div style={{paddingTop:"3px"}}>{title}</div>
                 <FontAwesomeIcon icon={faAngleDown} style={{paddingTop:"10px"}}/>
             </DropDownSelect>
             <DropDownMenu isDropped={selectIsOpen}>
                 <Ul>
                     <li>
-                        <LinkWrapper href="#1-1">난이도 낮은 순</LinkWrapper>
+                        <LinkWrapper onClick={() => handleLi('난이도 낮은 순')}>난이도 낮은 순</LinkWrapper>
                     </li>
                     <li>
-                        <LinkWrapper href="#1-1">난이도 높은 순</LinkWrapper>
+                        <LinkWrapper onClick={() => handleLi('난이도 높은 순')}>난이도 높은 순</LinkWrapper>
                     </li>
                     <li>
-                        <LinkWrapper href="#1-2">인기 순</LinkWrapper>
+                        <LinkWrapper onClick={() => handleLi('인기 순')}>인기 순</LinkWrapper>
                     </li>
                 </Ul>
             </DropDownMenu>
@@ -96,7 +108,7 @@ const Ul = styled.ul`
       background-color: #EDF0FF;
   }
 `;
-const LinkWrapper = styled.a`
+const LinkWrapper = styled.div`
     font-weight: 700;
     font-size: 15px;
     line-height: 200.2%;

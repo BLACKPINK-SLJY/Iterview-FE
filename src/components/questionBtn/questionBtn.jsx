@@ -3,28 +3,41 @@ import { styled } from 'styled-components';
 import colors from '../../style/color';
 import QImg from '../../assets/svg/Q.svg';
 import Bookmarkoff from '../../assets/svg/bookmark/bookmarkoff.svg';
-// import Bookmarkon from '../../assets/svg/bookmark/bookmarkon.svg';
+import Bookmarkon from '../../assets/svg/bookmark/bookmarkon.svg';
 import Tag from '../toggle/tag/tag';
 import LevelTag from '../toggle/tag/LevelTag';
+import axios from 'axios';
+import { useRecoilState } from 'recoil';
+import { UserState } from '../../recoil/userState';
+import { ScrabedState } from '../../recoil/QuestionState';
 
 function QuestionBtn(props) {
   const [isClicked, setIsClicked] = useState([]);
-  const { ischoose, contents, handleQuestionClick, selectedQuestionIds } = props;
+  const { ischoose, contents, handleQuestionClick, selectedQuestionIds, handleRandom } = props;
+  const [isScrab, setIsScrab] = useRecoilState(ScrabedState);
+  const [user, setUser] = useRecoilState(UserState);
 
-const handleClick = (questionId) => {
-    const isSelected = isClicked.includes(questionId);
+  const shouldSendHeader = !!user;
 
-    if (isSelected) {
-        setIsClicked(isClicked.filter((id) => id !== questionId));
-    }
-    else {
-        setIsClicked([...isClicked, questionId]);
-    }
+  const axiosConfig = {
+      headers: shouldSendHeader ? { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } : {},
+    };
+
+  const handleScrab = (questionId) => {
+      axios.put(`http://15.165.104.225/question/bookmark/${questionId}`, null, axiosConfig)
+      .then((res) => {
+          console.log(res.data);
+          setIsScrab((prevScrab) => ({ ...prevScrab, [questionId]: true }));
+      })
   }
 
-//   useEffect(() => {
-//     console.log(isClicked);
-//   }, [isClicked]);
+  const handleUnScrab = (questionId) => {
+    axios.put(`http://15.165.104.225/question/unbookmark/${questionId}`, null, axiosConfig)
+    .then((res) => {
+        console.log(res.data);
+        setIsScrab((prevScrab) => ({ ...prevScrab, [questionId]: false }));
+    })
+}
 
   return (
     <>
@@ -34,8 +47,7 @@ const handleClick = (questionId) => {
             <Header onClick={() => handleQuestionClick(question.questionId)}>
                   <div style={{display:"flex", width:"1050px", height:"fit-content", marginRight:"5px"}}>
                   <QImgStyle src={QImg} />
-                      <div style={{}}>
-                          {/* {data[0].questions[0].question} */}
+                      <div>
                           {question.content}
                       </div>
                   </div>    
@@ -45,17 +57,21 @@ const handleClick = (questionId) => {
                         <LevelTag question={question}/>
                         <Tag question={question}/>
                     </TagList>
-                    <ScrapImg src={Bookmarkoff} alt="bookmark" />
+                    {isScrab[question.questionId] ?
+                       <ScrapImg questionId={question.questionId} onClick={() => {handleUnScrab(question.questionId)}} src={Bookmarkon} alt="bookmark" />
+                    :
+                       <ScrapImg questionId={question.questionId} onClick={() => {handleScrab(question.questionId)}} src={Bookmarkoff} alt="bookmark" />
+                    }
                 </Contents>
             </Container>
         ))
       :
-      contents.map((question) => (
+      contents && contents.map((question) => (
       <Container key={question.questionId}>
       <Header>
             <div style={{display:"flex", width:"1050px", height:"fit-content", marginRight:"5px"}}>
             <QImgStyle src={QImg} />
-                <div style={{}}>
+                <div>
                     {question.content}
                 </div>
             </div>    
@@ -65,7 +81,11 @@ const handleClick = (questionId) => {
               <LevelTag question={question}/>
               <Tag question={question}/>
               </TagList>
-              <ScrapImg src={Bookmarkoff} alt="bookmark" />
+              {isScrab[question.questionId] ?
+                       <ScrapImg questionId={question.questionId} onClick={() => {handleUnScrab(question.questionId)}} src={Bookmarkon} alt="bookmark" />
+                    :
+                       <ScrapImg questionId={question.questionId} onClick={() => {handleScrab(question.questionId)}} src={Bookmarkoff} alt="bookmark" />
+                    }
           </Contents>
       </Container>
       ))}
@@ -105,6 +125,7 @@ const ScrapImg = styled.img`
     height: 46px;
     margin-right: 10px;
     margin-bottom: 16px;
+    cursor: pointer;
 `
 const QImgStyle = styled.img`
   width: 30px;

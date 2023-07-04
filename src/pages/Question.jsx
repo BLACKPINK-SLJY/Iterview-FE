@@ -10,16 +10,18 @@ import Dice from '../assets/svg/dice.svg';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
-import { ClickedState, QuestionState } from '../recoil/QuestionState';
+import { ClickedState, QuestionState, ScrabedState } from '../recoil/QuestionState';
 import instance from '../instance/instance';
 import axios from 'axios';
+import { UserState } from '../recoil/userState';
 
 function Question() {
     const {category} = useParams();
     const [ischoose, setIsChoose] = useState(true);
-    const [isSelect, setIsSelect] = useState(false);
     const [questions, setQuestions] = useRecoilState(QuestionState);
-    // const [selectedQuestion, setSelectedQuestion] = useRecoilState(QuestionState);
+    const [user, setUser] = useRecoilState(UserState);
+    const [isScrab, setIsScrab] = useRecoilState(ScrabedState);
+    const [isCategory, setIsCategory] = useState('');
     const navigate = useNavigate();
 
     const [selectedQuestionIds, setSelectedQuestionIds] = useRecoilState(ClickedState);
@@ -38,17 +40,21 @@ function Question() {
     const getIsChoose = (text) => {
         setIsChoose(text);
     }
+
+    const shouldSendHeader = !!user;
+
+    const axiosConfig = {
+        headers: shouldSendHeader ? { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } : {},
+        params: {
+          category: category,
+        },
+      };
     
     useEffect(() => {
-        axios
-            .get('http://15.165.104.225/question/list', {
-                headers: {
-                Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-                },
-                params: {
-                category: category,
-                }
-            })
+        setQuestions([]);
+        if(ischoose){
+            axios
+            .get('http://15.165.104.225/question/list/order/level', axiosConfig)
             .then((res) => {
                 console.log(res);
                 setQuestions(res.data.data);
@@ -56,16 +62,62 @@ function Question() {
             .catch((err) => {
                 console.log(err);
             })
-    }, [category]);
+        }
+        else {
+            axios.get('http://15.165.104.225/question/random', axiosConfig)
+            .then((res) => {
+                console.log(res);
+                setQuestions(res.data.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+        }
+    }, [category, ischoose]);
 
     useEffect(() => {
         console.log(selectedQuestionIds);
       }, [selectedQuestionIds]);
 
-      useEffect(() => {
-          setSelectedQuestionIds([]);
-        console.log(selectedQuestionIds);
-      }, [ischoose]);
+    useEffect(() => {
+        setSelectedQuestionIds([]);
+    console.log(selectedQuestionIds);
+    }, [ischoose]);
+
+    useEffect(() => {
+        if(category === 'fe') setIsCategory('Frontend');
+        if(category === 'be') setIsCategory('Backend');
+        if(category === 'aos') setIsCategory('Android');
+        if(category === 'ios') setIsCategory('ios');
+    }, [category])
+
+    const handleRandom = () => {
+        axios.get('http://15.165.104.225/question/random', axiosConfig)
+        .then((res) => {
+            console.log(res);
+            setQuestions(res.data.data);
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+    }
+
+    const questionArr = [...questions];
+    const favoriteArr = questionArr.sort((a, b) => b.entireBookmarkedCount - a.entireBookmarkedCount);
+
+    const handleDropDown = (selectedValue) => {
+        axios
+        .get('http://15.165.104.225/question/list/order/level', axiosConfig)
+        .then((res) => {
+            setQuestions(res.data.data);
+            if(selectedValue === '난이도 낮은 순') setQuestions(res.data.data);
+            else if (selectedValue === '난이도 높은 순') {
+                const reversedData = [...res.data.data].reverse();
+                setQuestions(reversedData);
+            }
+            else setQuestions(favoriteArr);
+        })
+    }
 
   return (
     <>
@@ -76,19 +128,23 @@ function Question() {
             :
             <GraText>RANDOM TEST</GraText>
         }
-        <CategoryText>{questions.category}</CategoryText>
+        <CategoryText>{isCategory}</CategoryText>
         <TextStyle2>질문을 선택해 질문에 대한 답을 준비해보세요.<br/>동영상 녹화를 통해 면접 영상을 확인할 수 있습니다.</TextStyle2>
         <BtnFlex>
         <QuestionToggle getIsChoose={getIsChoose} />
         <div style={{display: "flex", gap:"16px", alignItems: "end"}}>
         {ischoose ?
-        <DropDownBtn />
+        <DropDownBtn handleDropDown={(selectedValue) => handleDropDown(selectedValue)}/>
         :
-        <RandomTestBtn><img src={Dice} alt='주사위' style={{marginRight: '6px'}}/>랜덤</RandomTestBtn>
+        <RandomTestBtn onClick={handleRandom}><img src={Dice} alt='주사위' style={{marginRight: '6px'}}/>랜덤</RandomTestBtn>
         }
         </div>
         </BtnFlex>
+        {ischoose ?
         <QuestionBtn contents={questions} ischoose={ischoose} handleQuestionClick={handleQuestionClick} selectedQuestionIds={selectedQuestionIds}/>
+        :
+        <QuestionBtn contents={questions} ischoose={ischoose} handleRandom={handleRandom} />
+        }
         <br/>
         {ischoose ?
         <GoTestBtn disabled={selectedQuestionIds.length === 0} onClick={() => navigate('/interview')}>면접 보기 ({selectedQuestionIds.length})</GoTestBtn>
