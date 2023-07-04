@@ -19,8 +19,8 @@ export const StyleSearchBar = styled.input`
     border-radius: 42px;
     border: none;
     padding-left: 22px;
-    font-weight: 300;
-    font-size: 15px;
+    font-weight: 400;
+    font-size: 16px;
     line-height: 20px;
     letter-spacing: 0.05em;
     outline: none;

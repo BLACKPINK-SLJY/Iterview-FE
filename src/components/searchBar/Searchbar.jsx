@@ -3,6 +3,9 @@ import { StyleSearchBar, MagnifierImg, SearchBoxStyle } from './style';
 import Magnifier from "../../assets/svg/magnifier.svg";
 // import { requestSearch } from '../../../apis/index';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useRecoilState } from 'recoil';
+import { UserState } from '../../recoil/userState';
 
 const SearchBar = () => {
 
@@ -10,46 +13,43 @@ const SearchBar = () => {
     const [result, setResult] = useState([]);
     const [isSuccess, setIsSuccess] = useState(true);
     const navigate = useNavigate();
+    const [user, setUser] = useRecoilState(UserState);
     
     console.log(search)
     const input = useRef();
 
+    const shouldSendHeader = !!user;
 
-    const searchQuery = (query) => {
-        if (query === "") return;
-        try {
-            // requestSearch(query)
-            //     .then((res) => {
-            //         // if (res.data === []) setIsSuccess(false);
-            //         // else setIsSuccess(true);
-
-            //         setResult(res.data);
-            //         console.log(search);
-            //         console.log(result);
-            //     })
-            //     .catch((e) => {
-            //         setResult([]);
-            //         setIsSuccess(false);
-            //     });
-        } catch (err) {
-            console.log(err);
-        } finally {
-        }
-    };
+    const axiosConfig = {
+        headers: shouldSendHeader ? { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } : {},
+      };
 
 
     const onChangeSearch = (e) => {
         setSearch(e.target.value);
     }
 
-    // useEffect(() => {
-    //     setResult();
-    //     setSearch();
-    // })
-
-    // const onClickSearchHandler = () => {
-    //     navigate("/search");
-    // }
+    const handleSearch = () => {
+        if(search.trim() !== "") {
+        axios
+            .get(`http://15.165.104.225/question/search/${search}`, axiosConfig)
+            .then((res) => {
+                console.log(res.data);
+                setResult(res.data.data);
+                navigate("/search", {
+                    state: {
+                      content: search,
+                      searchResult: res.data.data,
+                    },
+                  });
+                  setSearch("");
+            })}
+    }
+    const onKeyPressSearch = (e) => {
+        if (e.key === "Enter") {
+          handleSearch();
+        }
+      };
 
     return (
         <>
@@ -59,23 +59,10 @@ const SearchBar = () => {
                     ref={input}
                     value={search}
                     onChange={onChangeSearch}
-                    onKeyDown={() => {
-                        if (window.event.keyCode === 13) {
-                            searchQuery(search);
-                            navigate("/search", {
-                                state: {
-                                    content: search,
-                                    searchResult: result,
-                                }
-                            });
-                            setSearch("");
-                            
-                        }
-                    }}
+                    onKeyPress={onKeyPressSearch}
                     onSubmit={(e)=>{
-                        searchQuery(search);
-                        setSearch(e.target.value);
-                        input.current.value = "";
+                        e.preventDefault();
+                        handleSearch();
                     }}
                     placeholder="검색어를 입력하세요">
                 </StyleSearchBar>

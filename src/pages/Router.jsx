@@ -7,6 +7,7 @@ import Select from './Select';
 import Question from './Question';
 import Test from './Test';
 import Mypage from './Mypage';
+import Search from './Search';
 
 
 function Router() {
@@ -19,7 +20,8 @@ function Router() {
        <Route path='/select' element={<Select />} />
        <Route path='/question/:category' element={<Question />} />
        <Route path='/interview' element={<Test />} />
-       <Route path='/mypage' element={<Mypage />} />
+       <Route path='/mypage/:username' element={<Mypage />} />
+       <Route path='/search' element={<Search />} />
      </Routes>
     </BrowserRouter>
   )
