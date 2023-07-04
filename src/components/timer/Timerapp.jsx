@@ -7,12 +7,16 @@ import { useEffect } from 'react';
 
 function Timerapp(props) {
   const [timeover, setTimeOver] = useState(false);
+  const {isNum} = props;
 
   useEffect(() => {
-    let timer = setTimeout(() => {
+    setTimeOver(false)
+    const timer = setTimeout(() => {
       setTimeOver(true)
     }, 5000);
-  })
+    return () => clearTimeout(timer);
+  }, [isNum])
+
   return (
     <>
     {timeover ?

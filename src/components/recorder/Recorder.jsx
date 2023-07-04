@@ -17,6 +17,7 @@ export default function Recorder(props) {
   const [alert, setAlert] = useState(false);
   let [isminute, setIsMinute] = useState(0);
   const [running, setRunning] = useState(false);
+  const {isNum} = props;
 
   let today = new Date();
   let time = {
@@ -43,8 +44,13 @@ export default function Recorder(props) {
 
   const recordWebcam = useRecordWebcam(OPTIONS);
   useEffect(() => {
-    setTimeout(() => recordWebcam.open(), 5000);
-  }, [])
+    recordWebcam.close();
+    const timer = setTimeout(() => {
+      recordWebcam.open();
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, [isNum])
 
   useEffect(()=> {
     let intervalId;
@@ -223,7 +229,7 @@ export default function Recorder(props) {
             <span style={{fontWeight: "700", fontSize:"18px"}}>{isminute}분</span>이 지났습니다!
           </AlertContainer>
         }
-        <Timerapp/>
+        <Timerapp isNum={isNum}/>
         <VideoDiv>
         <Video
           ref={recordWebcam.webcamRef}
