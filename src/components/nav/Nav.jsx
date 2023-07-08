@@ -52,16 +52,16 @@ function Nav() {
                 <DropDownMenu isDropped={selectIsOpen}>
                   <Ul>
                     <LinkWrapper>
-                      <Link to='/question'>Frontend</Link>
+                      <Link to='/question/fe'>Frontend</Link>
                     </LinkWrapper>
                     <LinkWrapper>
-                      <Link to='/question'>Backend</Link>
+                      <Link to='/question/be'>Backend</Link>
                     </LinkWrapper>
                     <LinkWrapper>
-                      <Link to='/question'>Android</Link>
+                      <Link to='/question/aos'>Android</Link>
                     </LinkWrapper>
                     <LinkWrapper>
-                      <Link to='/question'>ios</Link>
+                      <Link to='/question/ios'>ios</Link>
                     </LinkWrapper>
                   </Ul>
                 </DropDownMenu>
@@ -80,7 +80,7 @@ function Nav() {
                 <DropDownMenu2 isDropped={myPageIsOpen}>
                   <Ul>
                     <LinkWrapper>
-                      <Link to='/mypage'>My Page</Link>
+                      <Link to={`/mypage/${user.account}`}>My Page</Link>
                     </LinkWrapper>
                     <LinkWrapper>
                       <Link to='/' onClick={handleLogout}>Log Out</Link>
