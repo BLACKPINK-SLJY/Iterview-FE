@@ -12,7 +12,7 @@ import Footer from '../components/footer/Footer';
 import colors from '../style/color';
 
 function Search() {
-
+    const [clickedQuestion, setclickedQuestion] = useRecoilState(ClickedState);
     const location = useLocation();
     const navigate = useNavigate();
     const search = location.state.content;
@@ -21,6 +21,7 @@ function Search() {
 
     useEffect(() => {
         setResult(location.state.searchResult.sort((a,b) => a.level - b.level));
+        setclickedQuestion([]);
       }, [location.state.searchResult]);
 
 
