@@ -8,6 +8,8 @@ import Question from './Question';
 import Test from './Test';
 import Mypage from './Mypage';
 import Search from './Search';
+import Answer from './Answer';
+import Video from './Video';
 
 
 function Router() {
@@ -21,6 +23,8 @@ function Router() {
        <Route path='/question/:category' element={<Question />} />
        <Route path='/interview' element={<Test />} />
        <Route path='/mypage/:username' element={<Mypage />} />
+       <Route path='/mypage/:username/:questionid' element={<Answer />} />
+       <Route path='/mypage/:username/:questionid/video' element={<Video />} />
        <Route path='/search' element={<Search />} />
      </Routes>
     </BrowserRouter>

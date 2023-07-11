@@ -13,7 +13,7 @@ import { ScrabedState } from '../../recoil/QuestionState';
 
 function QuestionBtn(props) {
   const [isClicked, setIsClicked] = useState([]);
-  const { ischoose, contents, handleQuestionClick, selectedQuestionIds, handleRandom } = props;
+  const { ischoose, contents, handleQuestionClick, selectedQuestionIds, inmypage, handleGoAnswer, mysol } = props;
   const [isScrab, setIsScrab] = useRecoilState(ScrabedState);
   const [user, setUser] = useRecoilState(UserState);
 
@@ -57,35 +57,60 @@ function QuestionBtn(props) {
                         <LevelTag question={question}/>
                         <Tag question={question}/>
                     </TagList>
+                    <div style={{display:'flex', gap:'15px'}}>
+                    {question.answered === 'Y' && inmypage ?
+                    <AnswerText>내 답변 보기</AnswerText>
+                    : question.answered === 'Y' &&
+                    <AnswerText>답변완료</AnswerText>
+                    }
                     {isScrab[question.questionId] ?
                        <ScrapImg questionId={question.questionId} onClick={() => {handleUnScrab(question.questionId)}} src={Bookmarkon} alt="bookmark" />
                     :
                        <ScrapImg questionId={question.questionId} onClick={() => {handleScrab(question.questionId)}} src={Bookmarkoff} alt="bookmark" />
                     }
+                    </div>
                 </Contents>
             </Container>
         ))
       :
       contents && contents.map((question) => (
       <Container key={question.questionId}>
-      <Header>
+        {mysol ? 
+            <Header onClick={() => handleGoAnswer(question.questionId)}>
             <div style={{display:"flex", width:"1050px", height:"fit-content", marginRight:"5px"}}>
             <QImgStyle src={QImg} />
                 <div>
                     {question.content}
                 </div>
             </div>    
-      </Header>
+            </Header>
+            :
+            <Header>
+            <div style={{display:"flex", width:"1050px", height:"fit-content", marginRight:"5px"}}>
+            <QImgStyle src={QImg} />
+                <div>
+                    {question.content}
+                </div>
+            </div>    
+          </Header>
+        }
           <Contents>
               <TagList>
               <LevelTag question={question}/>
               <Tag question={question}/>
               </TagList>
+              <div style={{display:'flex', gap:'15px'}}>
+              {question.answered === 'Y' && inmypage ?
+                    <AnswerText>내 답변 보기</AnswerText>
+                    : question.answered === 'Y' &&
+                    <AnswerText>답변완료</AnswerText>
+                    }
               {isScrab[question.questionId] ?
                        <ScrapImg questionId={question.questionId} onClick={() => {handleUnScrab(question.questionId)}} src={Bookmarkon} alt="bookmark" />
                     :
                        <ScrapImg questionId={question.questionId} onClick={() => {handleScrab(question.questionId)}} src={Bookmarkoff} alt="bookmark" />
                     }
+              </div>
           </Contents>
       </Container>
       ))}
@@ -146,4 +171,13 @@ const TagList = styled.div`
     margin-left: 76px;
     margin-top: 12px;
     margin-bottom: 24px;
+`
+const AnswerText = styled.div`
+    font-weight: 600;
+    font-size: 17px;
+    background: linear-gradient(135.86deg, #9E3DFF 0%, #3840FF 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    padding-top: 14px;
 `
