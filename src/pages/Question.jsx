@@ -11,7 +11,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import { ClickedState, QuestionState, ScrabedState } from '../recoil/QuestionState';
-import instance from '../instance/instance';
 import axios from 'axios';
 import { UserState } from '../recoil/userState';
 import { BaseUrl } from '../privateKey';
