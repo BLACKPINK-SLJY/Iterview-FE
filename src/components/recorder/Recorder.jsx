@@ -2,22 +2,21 @@ import React, {useState, useEffect} from "react";
 import { RecordWebcam, useRecordWebcam } from "react-record-webcam";
 import './style.css';
 import styled, {keyframes} from "styled-components";
-// import Modal from "../../Modal/Modal";
-// import Q from "../../../assets/Q..svg";
-// import axios from "axios";
-// import { BaseUrl } from "../../../privateKey";
-// import { ColorRing } from 'react-loader-spinner';
-// import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import colors from '../../style/color';
 import Timerapp from "../timer/Timerapp";
+import axios from "axios";
+import { useRecoilState } from 'recoil';
+import { AnsweredState, ClickedState } from "../../recoil/QuestionState";
 
-export default function Recorder(props) {
 
+const Recorder = ((props) => {
+  const [selected, setSelected] = useRecoilState(ClickedState);
   const [isUrl, setIsUrl] = useState("");
   const [alert, setAlert] = useState(false);
   let [isminute, setIsMinute] = useState(0);
   const [running, setRunning] = useState(false);
-  const {isNum} = props;
+  const {isNum, isquestionId, isRandomId, execute} = props;
+  const [doneRecord, setDoneRecord] = useRecoilState(AnsweredState);
 
   let today = new Date();
   let time = {
@@ -32,17 +31,16 @@ export default function Recorder(props) {
   let timestring = `${time.year}${time.month}${time.date}${time.hours}${time.minutes}${time.seconds}`;
 
   const OPTIONS = {
-    fileName: timestring,
-    filename: timestring + ".mp4",
+    filename: timestring,
     mimeType: "video/webm",
     width: 1920,
     height: 1080,
     disableLogs: true,
     video: true,
-    
   }
 
   const recordWebcam = useRecordWebcam(OPTIONS);
+
   useEffect(() => {
     recordWebcam.close();
     const timer = setTimeout(() => {
@@ -66,12 +64,21 @@ export default function Recorder(props) {
     };
   }, [running])
 
+  useEffect(() => {
+    if(execute) {
+      handleSubmitAnswer();
+    }
+  }, [execute])
+
+  useEffect(() => {
+    setDoneRecord(false);
+  }, [isquestionId, isRandomId])
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [ModalQuestion, setModalQuestion] = useState([]);
   const [filename, setFilename] = useState(`${timestring}.webm`);
   const [questionId, setQuestionId] = useState(props.questionkey);
   const [transcript, setTranscript] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
   const getRecordingFile = async () => {
     const blob = recordWebcam.getRecording();
@@ -124,6 +131,7 @@ export default function Recorder(props) {
   const onClickRecordStop = () => {
     recordWebcam.stop();
     stopTime();
+    setDoneRecord(true);
   }
 
   const onClickRecordOpen = () => {
@@ -136,7 +144,79 @@ export default function Recorder(props) {
     stopTime();
   }
 
-  const accessToken = localStorage.getItem('accessToken');
+  const handleSubmitAnswer = async () => {
+    const isblob = await recordWebcam.getRecording({type: "video/webm"});
+    getBlob(isblob);
+    if(selected.length > 0) {
+    axios
+      .get(`http://15.165.104.225/answer/presigned-url/upload?questionId=${isquestionId}`, {
+        headers: { 
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}` 
+        },
+      })
+      .then((res) => {
+        console.log(res.data.data.presignedUrl);
+        setIsUrl(res.data.data.presignedUrl);
+        console.log(isblob);
+        console.log(isUrl);
+        axios
+        .put(`${isUrl}`, {
+          isblob
+        })
+        .then((res) => {
+          console.log(res.data);
+          handleRequestdb(isquestionId);
+        })
+      })
+    }
+    else {
+      axios
+      .get(`http://15.165.104.225/answer/presigned-url/upload?questionId=${isRandomId}`, {
+        headers: { 
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}` 
+        },
+      })
+      .then((res) => {
+        console.log(res.data);
+        setIsUrl(res.data.data.presignedUrl);
+        console.log(isblob);
+        
+        axios
+        .put(`${isUrl}`, {
+          isblob
+        })
+        .then((res) => {
+          console.log(res.data);
+          handleRequestdb(isRandomId);
+        })
+      })
+    }
+  }
+
+  const handleRequestdb = (mode) => {
+    axios
+    .get(`http://15.165.104.225/answer/sync-db?questionId=${mode}`,{
+      headers: { 
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}` 
+      },
+    })
+    .then((res) => {
+      console.log(res.data);
+      handleRequestTranscribe(mode);
+    })
+  }
+
+  const handleRequestTranscribe = (mode) => {
+    axios
+    .get(`http://15.165.104.225/transcription?questionId=${mode}`,{
+      headers: { 
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}` 
+      },
+    })
+    .then((res) => {
+      console.log(res.data);
+    })
+  }
 
   return (
     <div>
@@ -193,35 +273,6 @@ export default function Recorder(props) {
           >
             카메라 끄기
           </RecorderBtnStyle>
-          {/* <RecorderBtnStyle
-            disabled={recordWebcam.status !== "PREVIEW"}
-            onClick={recordWebcam.download}
-            key={questionId}
-          >
-            Download
-          </RecorderBtnStyle> */}
-          {/* <RecorderBtnStyle
-                  disabled={recordWebcam.status !== "PREVIEW"}
-                  onClick={async () => {
-                    const blob = await recordWebcam.getRecording();
-                    getBlob(blob);
-                  }}
-                >
-                  Get blob
-          </RecorderBtnStyle> */}
-          {/* <RecorderBtnStyle2
-            disabled={
-              recordWebcam.status === "OPEN" ||
-              recordWebcam.status === "RECORDING" ||
-              recordWebcam.status === "ERROR" ||
-              recordWebcam.status === "기다려주세요..."
-            }
-            onClick={async () => {
-              const isblob = await recordWebcam.getRecording({type: "video/webm"});
-              getBlob(isblob);}}
-            >
-            내 답변 보기
-          </RecorderBtnStyle2> */}
         </BtnLayout>
         {
           isalert &&
@@ -260,7 +311,9 @@ export default function Recorder(props) {
       </div>
     </div>
   );
-}
+})
+
+export default Recorder
 
 const RecorderBtnStyle = styled.button`
   width: 110px;

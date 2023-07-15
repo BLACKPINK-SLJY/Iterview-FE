@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import Nav from '../components/nav/Nav'
 import { styled } from 'styled-components';
 import colors from '../style/color';
@@ -6,18 +6,18 @@ import QImg from '../assets/svg/Q.svg';
 import Sound from '../assets/svg/sound.svg';
 import Recorder from '../components/recorder/Recorder';
 import Silence from '../assets/mp3/silence.mp3'
-import { useEffect } from 'react';
 import Timerapp from '../components/timer/Timerapp';
 import Footer from '../components/footer/Footer';
-import { useState } from 'react';
 import Modal from '../components/modal/modal';
 import Tag from '../components/toggle/tag/tag';
 import SmallCheck from '../assets/svg/smallcheck.svg';
 import { useRecoilState } from 'recoil';
-import { ClickedState, QuestionState } from '../recoil/QuestionState';
+import { AnsweredState, ClickedState, QuestionState } from '../recoil/QuestionState';
 import Keywords from '../components/toggle/tag/Keywords';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { UserState } from '../recoil/userState';
+import { axios } from 'axios';
+import Mp3 from '../assets/mp3/test.mp3';
 
 function Test() {
     const [selected, setSelected] = useRecoilState(ClickedState);
@@ -26,34 +26,45 @@ function Test() {
     const [isCloseModal, setIsCloseModal] = useState(false);
     const [isNum, setIsNum] = useState(0);
     const [iscategory, setIsCategory] = useState(questions[0].category.toLowerCase());
-    const navigate = useNavigate();
+    const [isDisabled, setIsDisabled] = useState(false);
     const [user, setUser] = useRecoilState(UserState);
+    const [execute, setExecute] = useState(false);
+    const [doneRecord, setDoneRecord] = useRecoilState(AnsweredState);
+    const navigate = useNavigate();
 
     const clickedTest = questions.filter((item) => selected.includes(item.questionId)).map((item) => item);
 
     const [istitle, setIstitle] = useState(clickedTest.length > 0 ? clickedTest[isNum].content : "");
     const [isRandomTitle, setIsRandomTitle] = useState(questions[isNum].content);
+    const [isquestionId, setIsquestionId] = useState(clickedTest.length > 0 ? clickedTest[isNum].questionId : 0);
+    const [isRandomId, setIsRandomId] = useState(questions[isNum].questionId);
     const [isCount, setIsCount] = useState(isNum+1);
 
-    console.log(clickedTest);
-
-    // const soundPlay = () => {
-    //     const audio = new Audio(Mp3);   
-    //     audio.play();
-    // }
-
-    const onClickSubmitModal = () => {
+    const handleSubmitAnswer = () => {
         setIsSubmitModal(true);
-    }
+        setExecute(true);
+    };
+
+    useEffect(() => {
+        if(!doneRecord) {
+            setIsDisabled(true);
+        }
+        else {
+            setIsDisabled(false);
+        }
+    }, [isNum, doneRecord])
 
     const onClickNextModal = () => {
         setIsSubmitModal(false);
+        setExecute(false);
         setIsNum((isNum) => isNum+1);
         if(selected.length > 0){
             setIstitle(clickedTest[isNum+1].content);
+            setIsquestionId(clickedTest[isNum+1].questionId)
         }
         else {
             setIsRandomTitle(questions[isNum+1].content);
+            setIsRandomId(questions[isNum+1].questionId);
         }
         setIsCount(isCount+1);
         console.log(isNum);
@@ -74,20 +85,20 @@ function Test() {
                 <QuestionText>
                     <QImgStyle src={QImg} />
                         {istitle}
-                    <iframe src={Silence} title="test" allow="autoplay" id="audio" style={{display:"none"}}></iframe>
-                    {/* <SpeakerStyle src={Sound} alt="speaker" onClick={soundPlay}/> */}
                 </QuestionText>
                 :
                 <QuestionText>
                     <QImgStyle src={QImg} />
                         {isRandomTitle}
-                    <iframe src={Silence} title="test" allow="autoplay" id="audio" style={{display:"none"}}></iframe>
-                    {/* <SpeakerStyle src={Sound} alt="speaker" onClick={soundPlay}/> */}
                 </QuestionText>
             }
             </Header>
         </QuestionBox>
-        <Recorder isNum={isNum}/>
+        {selected.length > 0 ?
+            <Recorder execute={execute} isquestionId={isquestionId} isSubmitModal={isSubmitModal} isNum={isNum}/>
+            :
+            <Recorder execute={execute} isRandomId={isRandomId} isNum={isNum}/>
+        }
         <EndSubmitLayout>
           <EndBtn onClick={onClickCloseModal}>종료하기</EndBtn>
           <TextStyle>{isCount}
@@ -97,7 +108,7 @@ function Test() {
                         <TextStyle2> / {questions.length}</TextStyle2>
             }
           </TextStyle>
-          <SubmitBtn onClick={onClickSubmitModal}>제출하기</SubmitBtn>
+          <SubmitBtn onClick={handleSubmitAnswer} disabled={isDisabled}>제출하기</SubmitBtn>
         </EndSubmitLayout>
     </Container>
     <Footer />
@@ -238,6 +249,7 @@ const EndBtn = styled.button`
   font-weight: 500;
   filter: drop-shadow(0px 0px 8.7223px rgba(0, 0, 0, 0.1));
   border-radius: 33.1447px;
+  cursor: pointer;
 `
 const SubmitBtn = styled.button`
   width: 95.86px;
@@ -247,6 +259,10 @@ const SubmitBtn = styled.button`
   border-radius: 33.1447px;
   border: none;
   color: white;
+  cursor: pointer;
+  &:disabled {
+      cursor: not-allowed;
+  }
 `
 const TextStyle = styled.div`
   display: flex;
@@ -298,6 +314,7 @@ const ModalNextBtn = styled.button`
     color: ${colors.white_100};
     border: none;
     margin-bottom: 16px;
+    cursor: pointer;
 `
 const ModalCompleteText = styled.div`
     font-weight: 500;
@@ -336,4 +353,5 @@ const NoBtn = styled.div`
     line-height: 17px;
     letter-spacing: 0.05em;
     color: ${colors.white_100};
+    cursor: pointer;
 `
