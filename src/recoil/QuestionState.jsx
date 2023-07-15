@@ -18,3 +18,9 @@ export const ScrabedState = atom({
     default: [],
     effects_UNSTABLE: [persistAtom],
 })
+
+export const AnsweredState = atom({
+    key: "AnsweredState",
+    default: '',
+    effects_UNSTABLE: [persistAtom],
+})

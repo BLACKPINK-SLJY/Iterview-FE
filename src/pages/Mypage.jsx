@@ -18,9 +18,19 @@ function Mypage(props) {
     const [mysol, setMySol] = useState(true);
     const [iscategory, setIscategory] = useState('');
     const [contents, setContents] = useState([]);
+    const [recent, setRecent] = useState([]);
     const [inMypage, setInMypage] = useState(true);
     const [isAnswer, setIsAnswer] = useRecoilState(AnsweredState);
     const navigate = useNavigate();
+
+    const shouldSendHeader = !!user;
+
+    const axiosConfig = {
+        headers: shouldSendHeader ? { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } : {},
+        params: {
+          category: iscategory,
+        },
+      };
     
     const getMySol = (text) => {
         setMySol(text);
@@ -47,6 +57,7 @@ function Mypage(props) {
             },
         })
         .then((res) => {
+            setRecent(res.data.data);
             setContents(res.data.data);
         })
     }
@@ -62,9 +73,21 @@ function Mypage(props) {
             },
         })
         .then((res) => {
+            setRecent(res.data.data);
             setContents(res.data.data);
         })
     }
+
+    const questionArr = [...contents];
+    const levelArr = questionArr.sort((a,b) => a.level - b.level);
+    const favoriteArr = questionArr.sort((a, b) => b.entireBookmarkedCount - a.entireBookmarkedCount);
+
+    const handleDropDown = (selectedValue) => {
+            if(selectedValue === '난이도 낮은 순') setContents(levelArr);
+            else if (selectedValue === '난이도 높은 순') setContents(levelArr.reverse());
+            else if(selectedValue === '인기 순') setContents(favoriteArr);
+            else if(selectedValue === '최신 순') setContents(recent);
+        }
 
     const handleGoAnswer = (questionId) => {
         navigate(`/mypage/${user.account}/${questionId}`);
@@ -80,7 +103,7 @@ function Mypage(props) {
         <BtnFlex>
         <MypageToggle getMySol={getMySol}/>
         <div style={{display: "flex", gap:"16px", alignItems: "end"}}>
-        <MyPageDropDownBtn />
+        <MyPageDropDownBtn handleDropDown={(selectedValue) => handleDropDown(selectedValue)} />
         <DropDownRole />
         </div>
         </BtnFlex>
