@@ -14,6 +14,7 @@ import { ClickedState, QuestionState, ScrabedState } from '../recoil/QuestionSta
 import instance from '../instance/instance';
 import axios from 'axios';
 import { UserState } from '../recoil/userState';
+import { BaseUrl } from '../privateKey';
 
 function Question() {
     const {category} = useParams();
@@ -54,7 +55,7 @@ function Question() {
         setQuestions([]);
         if(ischoose){
             axios
-            .get('http://15.165.104.225/question/list/order/level', axiosConfig)
+            .get(`${BaseUrl}/question/list/order/level`, axiosConfig)
             .then((res) => {
                 console.log(res);
                 setQuestions(res.data.data);
@@ -64,7 +65,7 @@ function Question() {
             })
         }
         else {
-            axios.get('http://15.165.104.225/question/random', axiosConfig)
+            axios.get(`${BaseUrl}/question/random`, axiosConfig)
             .then((res) => {
                 console.log(res);
                 setQuestions(res.data.data);
@@ -92,7 +93,7 @@ function Question() {
     }, [category])
 
     const handleRandom = () => {
-        axios.get('http://15.165.104.225/question/random', axiosConfig)
+        axios.get(`${BaseUrl}/question/random`, axiosConfig)
         .then((res) => {
             console.log(res);
             setQuestions(res.data.data);
@@ -107,7 +108,7 @@ function Question() {
 
     const handleDropDown = (selectedValue) => {
         axios
-        .get('http://15.165.104.225/question/list/order/level', axiosConfig)
+        .get(`${BaseUrl}/question/list/order/level`, axiosConfig)
         .then((res) => {
             setQuestions(res.data.data);
             if(selectedValue === '난이도 낮은 순') setQuestions(res.data.data);

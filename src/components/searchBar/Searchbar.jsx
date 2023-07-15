@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useRecoilState } from 'recoil';
 import { UserState } from '../../recoil/userState';
+import { BaseUrl } from '../../privateKey';
 
 const SearchBar = () => {
 
@@ -31,7 +32,7 @@ const SearchBar = () => {
     const handleSearch = () => {
         if(search.trim() !== "") {
         axios
-            .get(`http://15.165.104.225/question/search/${search}`, axiosConfig)
+            .get(`${BaseUrl}/question/search/${search}`, axiosConfig)
             .then((res) => {
                 console.log(res.data);
                 setResult(res.data.data);

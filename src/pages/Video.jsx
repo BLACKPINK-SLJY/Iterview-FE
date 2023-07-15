@@ -15,6 +15,7 @@ import { AnsweredState, QuestionState, ScrabedState } from '../recoil/QuestionSt
 import { UserState } from '../recoil/userState';
 import axios from 'axios';
 import Footer from '../components/footer/Footer';
+import { BaseUrl } from '../privateKey';
 
 function Video() {
     const [data, setData] = useState({});
@@ -41,7 +42,7 @@ function Video() {
       };
 
     const handleScrab = (questionId) => {
-        axios.put(`http://15.165.104.225/question/bookmark/${questionId}`, null, axiosConfig)
+        axios.put(`${BaseUrl}/question/bookmark/${questionId}`, null, axiosConfig)
         .then((res) => {
             console.log(res.data);
             setIsScrab((prevScrab) => ({ ...prevScrab, [questionId]: true }));
@@ -49,7 +50,7 @@ function Video() {
     }
   
     const handleUnScrab = (questionId) => {
-      axios.put(`http://15.165.104.225/question/unbookmark/${questionId}`, null, axiosConfig)
+      axios.put(`${BaseUrl}/question/unbookmark/${questionId}`, null, axiosConfig)
       .then((res) => {
           console.log(res.data);
           setIsScrab((prevScrab) => ({ ...prevScrab, [questionId]: false }));

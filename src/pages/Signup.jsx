@@ -9,6 +9,7 @@ import { useRecoilState } from 'recoil';
 import { UserState } from '../recoil/userState';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { BaseUrl } from '../privateKey';
 
 function Signup() {
   const [account, setAccount] = useState('');
@@ -29,7 +30,7 @@ function Signup() {
   const onHandleSubmit = (e) => {
     e.preventDefault();
     axios
-        .post('http://15.165.104.225/signup', {
+        .post(`${BaseUrl}/signup`, {
               account: account,
               password: password,
         })

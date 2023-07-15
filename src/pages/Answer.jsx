@@ -14,6 +14,7 @@ import Bookmarkoff from '../assets/svg/bookmark/bookmarkoff.svg';
 import Bookmarkon from '../assets/svg/bookmark/bookmarkon.svg';
 import { useNavigate } from 'react-router-dom';
 import { ColorRing } from 'react-loader-spinner';
+import { BaseUrl } from '../privateKey';
 
 function Answer() {
     const [questions, setQuestions] = useRecoilState(QuestionState);
@@ -46,7 +47,7 @@ function Answer() {
 
     useEffect(() => {
         axios
-        .get('http://15.165.104.225/answer/dummy', {})
+        .get(`${BaseUrl}/answer/dummy`, {})
         .then((res) => {
             setIsdummy(res.data.data);
         })
@@ -67,7 +68,7 @@ function Answer() {
 
      
     const handleScrab = (questionId) => {
-        axios.put(`http://15.165.104.225/question/bookmark/${questionId}`, null, axiosConfig)
+        axios.put(`${BaseUrl}/question/bookmark/${questionId}`, null, axiosConfig)
         .then((res) => {
             console.log(res.data);
             setIsScrab((prevScrab) => ({ ...prevScrab, [questionId]: true }));
@@ -75,7 +76,7 @@ function Answer() {
     }
   
     const handleUnScrab = (questionId) => {
-      axios.put(`http://15.165.104.225/question/unbookmark/${questionId}`, null, axiosConfig)
+      axios.put(`${BaseUrl}/question/unbookmark/${questionId}`, null, axiosConfig)
       .then((res) => {
           console.log(res.data);
           setIsScrab((prevScrab) => ({ ...prevScrab, [questionId]: false }));

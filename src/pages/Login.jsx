@@ -9,6 +9,7 @@ import Footer from '../components/footer/Footer';
 import { useRecoilState } from 'recoil';
 import { UserState } from '../recoil/userState';
 import axios from 'axios';
+import { BaseUrl } from '../privateKey';
 
 
 function Login() {
@@ -33,7 +34,7 @@ function Login() {
   const onHandleSubmit = (e) => {
     e.preventDefault();
     axios
-        .post('http://15.165.104.225/login', {
+        .post(`${BaseUrl}/login`, {
               account: account,
               password: password,
         })

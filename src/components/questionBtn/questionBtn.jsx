@@ -10,6 +10,7 @@ import axios from 'axios';
 import { useRecoilState } from 'recoil';
 import { UserState } from '../../recoil/userState';
 import { ScrabedState } from '../../recoil/QuestionState';
+import { BaseUrl } from '../../privateKey';
 
 function QuestionBtn(props) {
   const [isClicked, setIsClicked] = useState([]);
@@ -24,7 +25,7 @@ function QuestionBtn(props) {
     };
 
   const handleScrab = (questionId) => {
-      axios.put(`http://15.165.104.225/question/bookmark/${questionId}`, null, axiosConfig)
+      axios.put(`${BaseUrl}/question/bookmark/${questionId}`, null, axiosConfig)
       .then((res) => {
           console.log(res.data);
           setIsScrab((prevScrab) => ({ ...prevScrab, [questionId]: true }));
@@ -32,7 +33,7 @@ function QuestionBtn(props) {
   }
 
   const handleUnScrab = (questionId) => {
-    axios.put(`http://15.165.104.225/question/unbookmark/${questionId}`, null, axiosConfig)
+    axios.put(`${BaseUrl}/question/unbookmark/${questionId}`, null, axiosConfig)
     .then((res) => {
         console.log(res.data);
         setIsScrab((prevScrab) => ({ ...prevScrab, [questionId]: false }));

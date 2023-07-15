@@ -7,6 +7,7 @@ import Timerapp from "../timer/Timerapp";
 import axios from "axios";
 import { useRecoilState } from 'recoil';
 import { AnsweredState, ClickedState } from "../../recoil/QuestionState";
+import { BaseUrl } from '../../privateKey';
 
 
 const Recorder = ((props) => {
@@ -149,7 +150,7 @@ const Recorder = ((props) => {
     getBlob(isblob);
     if(selected.length > 0) {
     axios
-      .get(`http://15.165.104.225/answer/presigned-url/upload?questionId=${isquestionId}`, {
+      .get(`${BaseUrl}/answer/presigned-url/upload?questionId=${isquestionId}`, {
         headers: { 
           Authorization: `Bearer ${localStorage.getItem('accessToken')}` 
         },
@@ -171,7 +172,7 @@ const Recorder = ((props) => {
     }
     else {
       axios
-      .get(`http://15.165.104.225/answer/presigned-url/upload?questionId=${isRandomId}`, {
+      .get(`${BaseUrl}/answer/presigned-url/upload?questionId=${isRandomId}`, {
         headers: { 
           Authorization: `Bearer ${localStorage.getItem('accessToken')}` 
         },
@@ -195,7 +196,7 @@ const Recorder = ((props) => {
 
   const handleRequestdb = (mode) => {
     axios
-    .get(`http://15.165.104.225/answer/sync-db?questionId=${mode}`,{
+    .get(`${BaseUrl}/answer/sync-db?questionId=${mode}`,{
       headers: { 
         Authorization: `Bearer ${localStorage.getItem('accessToken')}` 
       },
@@ -208,7 +209,7 @@ const Recorder = ((props) => {
 
   const handleRequestTranscribe = (mode) => {
     axios
-    .get(`http://15.165.104.225/transcription?questionId=${mode}`,{
+    .get(`${BaseUrl}/transcription?questionId=${mode}`,{
       headers: { 
         Authorization: `Bearer ${localStorage.getItem('accessToken')}` 
       },

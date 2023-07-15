@@ -12,6 +12,7 @@ import QuestionBtn from '../components/questionBtn/questionBtn';
 import Footer from '../components/footer/Footer';
 import { useNavigate } from 'react-router-dom';
 import { AnsweredState } from '../recoil/QuestionState';
+import { BaseUrl } from '../privateKey';
 
 function Mypage(props) {
     const [user, setUser] = useRecoilState(UserState);
@@ -34,7 +35,12 @@ function Mypage(props) {
     
     const getMySol = (text) => {
         setMySol(text);
-        console.log(mysol);
+        if(mysol) {
+            setInMypage(true);
+        }
+        else {
+            setInMypage(false);
+        }
     }
 
     useEffect(() => {
@@ -48,7 +54,7 @@ function Mypage(props) {
 
     const handleAnswered = () => {
         axios
-        .get('http://15.165.104.225/question/my/answered', {
+        .get(`${BaseUrl}/question/my/answered`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('accessToken')}`
             },
@@ -64,7 +70,7 @@ function Mypage(props) {
 
     const handleBookmark = () => {
         axios
-        .get('http://15.165.104.225/question/my/bookmarked', {
+        .get(`${BaseUrl}/question/my/bookmarked`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('accessToken')}`
             },
@@ -110,7 +116,7 @@ function Mypage(props) {
         {mysol ?
         <QuestionBtn contents={contents} inmypage={inMypage} handleGoAnswer={handleGoAnswer} mysol={mysol}/>
         :
-        <QuestionBtn contents={contents} inmypage={inMypage}/>
+        <QuestionBtn contents={contents} inmypage={inMypage} />
         }
     </Container>
     <br/>
