@@ -61,7 +61,7 @@ function Nav() {
                       <Link to='/question/aos'>Android</Link>
                     </LinkWrapper>
                     <LinkWrapper>
-                      <Link to='/question/ios'>ios</Link>
+                      <Link to='/question/ios'>iOS</Link>
                     </LinkWrapper>
                   </Ul>
                 </DropDownMenu>

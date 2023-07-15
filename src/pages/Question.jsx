@@ -88,7 +88,7 @@ function Question() {
         if(category === 'fe') setIsCategory('Frontend');
         if(category === 'be') setIsCategory('Backend');
         if(category === 'aos') setIsCategory('Android');
-        if(category === 'ios') setIsCategory('ios');
+        if(category === 'ios') setIsCategory('iOS');
     }, [category])
 
     const handleRandom = () => {

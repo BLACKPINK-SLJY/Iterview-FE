@@ -69,8 +69,8 @@ function Select() {
         onMouseOut={()=>setOnHover4(0)}
       >
       {onHover4 ? (
-          <SelecBtn onClick={() => handleCategorySelect('ios')}><img src={GIOS} alt="gios"></img><br/><GraText>ios</GraText></SelecBtn>
-      ) : <SelecBtn onClick={() => handleCategorySelect('ios')}><img src={IOS} alt="ios"></img><br/>ios</SelecBtn>
+          <SelecBtn onClick={() => handleCategorySelect('ios')}><img src={GIOS} alt="gios"></img><br/><GraText>iOS</GraText></SelecBtn>
+      ) : <SelecBtn onClick={() => handleCategorySelect('ios')}><img src={IOS} alt="ios"></img><br/>iOS</SelecBtn>
       }
       </div>
     </SelectGrid>
