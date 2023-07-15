@@ -5,12 +5,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import useDetectClose from '../nav/useDetectClose';
 
-function DropDownBtn() {
+function DropDownBtn({handleDropDown}) {
     const [selectIsOpen, selectRef, selectHandler] = useDetectClose(false)
     const [selectedText, setSelectedText] = useState("최신 순");
 
-    const onClickDrop = () => {
-
+    const handleLi = (selectedValue) => {
+      handleDropDown(selectedValue);
+      setSelectedText(selectedValue);
     }
 
   return (
@@ -22,16 +23,16 @@ function DropDownBtn() {
             </DropDownSelect>
             <DropDownMenu isDropped={selectIsOpen}>
                 <Ul>
-                    <li onClick={() => setSelectedText("최신 순")}>
+                    <li onClick={() => handleLi("최신 순")} style={{cursor:'pointer'}}>
                         <LinkWrapper>최신 순</LinkWrapper>
                     </li>
-                    <li onClick={() => setSelectedText("난이도 낮은 순")}>
+                    <li onClick={() => handleLi("난이도 낮은 순")} style={{cursor:'pointer'}}>
                         <LinkWrapper>난이도 낮은 순</LinkWrapper>
                     </li>
-                    <li onClick={() => setSelectedText("난이도 높은 순")}>
+                    <li onClick={() => handleLi("난이도 높은 순")} style={{cursor:'pointer'}}>
                         <LinkWrapper>난이도 높은 순</LinkWrapper>
                     </li>
-                    <li onClick={() => setSelectedText("인기 순")}>
+                    <li onClick={() => handleLi("인기 순")} style={{cursor:'pointer'}}>
                         <LinkWrapper>인기 순</LinkWrapper>
                     </li>
                 </Ul>

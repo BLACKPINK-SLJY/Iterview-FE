@@ -18,19 +18,19 @@ function DropDownRole() {
             </DropDownSelect>
             <DropDownMenu isDropped={selectIsOpen}>
                 <Ul>
-                    <li onClick={() => setSelectedText("전체")}>
+                    <li onClick={() => setSelectedText("전체")} style={{cursor:'pointer'}}>
                         <LinkWrapper>전체</LinkWrapper>
                     </li>
-                    <li onClick={() => setSelectedText("Frontend")}>
+                    <li onClick={() => setSelectedText("Frontend")} style={{cursor:'pointer'}}>
                         <LinkWrapper>Frontend</LinkWrapper>
                     </li>
-                    <li onClick={() => setSelectedText("Backend")}>
+                    <li onClick={() => setSelectedText("Backend")} style={{cursor:'pointer'}}>
                         <LinkWrapper>Backend</LinkWrapper>
                     </li>
-                    <li onClick={() => setSelectedText("Android")}>
+                    <li onClick={() => setSelectedText("Android")} style={{cursor:'pointer'}}>
                         <LinkWrapper>Android</LinkWrapper>
                     </li>
-                    <li onClick={() => setSelectedText("ios")}>
+                    <li onClick={() => setSelectedText("ios")} style={{cursor:'pointer'}}>
                         <LinkWrapper>ios</LinkWrapper>
                     </li>
                 </Ul>
