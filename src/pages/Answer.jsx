@@ -25,33 +25,43 @@ function Answer() {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
-    // useEffect(() => {
-    //     if(loading) {
-    //         setInterval(() => {
-    //             axios
-    //             .get(`http://15.165.104.225/answer?questionId=${isAnswer}`, {
-    //                 headers: { 
-    //                     Authorization: `Bearer ${localStorage.getItem('accessToken')}` 
-    //                   },
-    //             })
-    //             .then((res) => {
-    //                 console.log(res.data);
-    //                 setIsdummy(res.data.data);
-    //                 if(res.data.data.created === 'Y') {
-    //                     setLoading(false);
-    //                 }
-    //             })
-    //         }, 2000);
-    //     }
-    // })
-
     useEffect(() => {
-        axios
-        .get(`${BaseUrl}/answer/dummy`, {})
-        .then((res) => {
-            setIsdummy(res.data.data);
-        })
-    },[])
+        let interval = null;
+    
+        if (loading) {
+            interval = setInterval(() => {
+                axios
+                    .get(`${BaseUrl}/answer?questionId=${isAnswer}`, {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+                        },
+                    })
+                    .then((res) => {
+                        console.log(res.data);
+                        setIsdummy(res.data.data);
+                        if (res.data.data.created === 'Y') {
+                            setLoading(false);
+                            clearInterval(interval); // 인터벌 중지
+                        }
+                    })
+            }, 2000);
+        } else {
+            clearInterval(interval); // 인터벌 중지
+        }
+    
+        return () => {
+            clearInterval(interval); // 컴포넌트 언마운트 시에도 인터벌 중지
+        };
+    }, [loading]);
+    
+
+    // useEffect(() => {
+    //     axios
+    //     .get(`${BaseUrl}/answer/dummy`, {})
+    //     .then((res) => {
+    //         setIsdummy(res.data.data);
+    //     })
+    // },[])
 
       const highlightLanguages = (text) => {
         const regex = /@@(.*?)@@/g;

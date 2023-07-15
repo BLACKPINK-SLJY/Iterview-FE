@@ -11,7 +11,7 @@ import axios from 'axios';
 import QuestionBtn from '../components/questionBtn/questionBtn';
 import Footer from '../components/footer/Footer';
 import { useNavigate } from 'react-router-dom';
-import { AnsweredState } from '../recoil/QuestionState';
+import { AnsweredState, QuestionState } from '../recoil/QuestionState';
 import { BaseUrl } from '../privateKey';
 
 function Mypage(props) {
@@ -21,6 +21,7 @@ function Mypage(props) {
     const [contents, setContents] = useState([]);
     const [recent, setRecent] = useState([]);
     const [inMypage, setInMypage] = useState(true);
+    const [question, setQuestion] = useRecoilState(QuestionState);
     const [isAnswer, setIsAnswer] = useRecoilState(AnsweredState);
     const navigate = useNavigate();
 
@@ -44,6 +45,12 @@ function Mypage(props) {
     }
 
     useEffect(() => {
+        axios.get(`${BaseUrl}/question/list`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+            },
+        }).then((res) => setQuestion(res.data.data))
+
         if(mysol) {
             handleAnswered();
         }

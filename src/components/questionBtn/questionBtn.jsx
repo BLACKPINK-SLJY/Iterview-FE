@@ -27,7 +27,6 @@ function QuestionBtn(props) {
   const handleScrab = (questionId) => {
       axios.put(`${BaseUrl}/question/bookmark/${questionId}`, null, axiosConfig)
       .then((res) => {
-          console.log(res.data);
           setIsScrab((prevScrab) => ({ ...prevScrab, [questionId]: true }));
       })
   }
@@ -35,7 +34,6 @@ function QuestionBtn(props) {
   const handleUnScrab = (questionId) => {
     axios.put(`${BaseUrl}/question/unbookmark/${questionId}`, null, axiosConfig)
     .then((res) => {
-        console.log(res.data);
         setIsScrab((prevScrab) => ({ ...prevScrab, [questionId]: false }));
     })
 }

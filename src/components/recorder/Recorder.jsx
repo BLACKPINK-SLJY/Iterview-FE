@@ -147,6 +147,7 @@ const Recorder = ((props) => {
 
   const handleSubmitAnswer = async () => {
     const isblob = await recordWebcam.getRecording({type: "video/webm"});
+
     getBlob(isblob);
     if(selected.length > 0) {
     axios
@@ -157,14 +158,15 @@ const Recorder = ((props) => {
       })
       .then((res) => {
         console.log(res.data.data.presignedUrl);
-        setIsUrl(res.data.data.presignedUrl);
-        console.log(isblob);
-        console.log(isUrl);
         axios
-        .put(`${isUrl}`, {
-          isblob
-        })
+        .put(res.data.data.presignedUrl,
+          isblob,
+          {
+          headers: { "Content-Type": "video/webm" }
+          },
+        )
         .then((res) => {
+          console.log()
           console.log(res.data);
           handleRequestdb(isquestionId);
         })
@@ -178,12 +180,10 @@ const Recorder = ((props) => {
         },
       })
       .then((res) => {
-        console.log(res.data);
-        setIsUrl(res.data.data.presignedUrl);
         console.log(isblob);
         
         axios
-        .put(`${isUrl}`, {
+        .put(res.data.data.presignedUrl, {
           isblob
         })
         .then((res) => {

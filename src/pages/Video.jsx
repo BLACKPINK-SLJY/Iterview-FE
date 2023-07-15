@@ -24,15 +24,22 @@ function Video() {
     const [isAnswer, setIsAnswer] = useRecoilState(AnsweredState);
     const [isScrab, setIsScrab] = useRecoilState(ScrabedState);
     const [user, setUser] = useRecoilState(UserState);
-    const [dummy, setIsdummy] = useState([]);
+    const [videodata, setVideodata] = useState([]);
+    const [duration, setDuration] = useState("");
+    const videoduration = duration.duration;
 
-    // useEffect(() => {
-    //     axios
-    //     .get('http://15.165.104.225/answer/replay/dummy', {})
-    //     .then((res) => {
-    //         setIsdummy(res.data.data);
-    //     })
-    // })
+    useEffect(() => {
+        axios
+        .get(`${BaseUrl}/answer/replay?questionId=${isAnswer}`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+            },
+        })
+        .then((res) => {
+            setVideodata(res.data.data);
+            setDuration(res.data.data.url);
+        })
+    })
     const answeredQuestion = questions.filter((item) => item.questionId === isAnswer);
 
     const shouldSendHeader = !!user;
@@ -47,6 +54,9 @@ function Video() {
             console.log(res.data);
             setIsScrab((prevScrab) => ({ ...prevScrab, [questionId]: true }));
         })
+        .catch((err) => {
+            console.log(err);
+        })
     }
   
     const handleUnScrab = (questionId) => {
@@ -55,6 +65,9 @@ function Video() {
           console.log(res.data);
           setIsScrab((prevScrab) => ({ ...prevScrab, [questionId]: false }));
       })
+      .catch((err) => {
+        console.log(err);
+    })
   }
 
     const json = {
@@ -79,184 +92,7 @@ function Video() {
                     "word": "is",
                     "punct": "is",
                     "index": 1
-                },
-                {
-                    "start": 13.38,
-                    "confidence": 0.99,
-                    "end": 13.44,
-                    "word": "a",
-                    "punct": "a",
-                    "index": 2
-                },
-                {
-                    "start": 13.44,
-                    "confidence": 1,
-                    "end": 13.86,
-                    "word": "day",
-                    "punct": "day.",
-                    "index": 3
-                },
-                {
-                    "start": 13.86,
-                    "confidence": 1,
-                    "end": 14.13,
-                    "word": "about",
-                    "punct": "About",
-                    "index": 4
-                },
-                {
-                    "start": 14.13,
-                    "confidence": 1,
-                    "end": 14.38,
-                    "word": "ten",
-                    "punct": "ten",
-                    "index": 5
-                },
-                {
-                    "start": 14.38,
-                    "confidence": 1,
-                    "end": 14.61,
-                    "word": "years",
-                    "punct": "years",
-                    "index": 6
-                },
-                {
-                    "start": 14.61,
-                    "confidence": 1,
-                    "end": 15.15,
-                    "word": "ago",
-                    "punct": "ago",
-                    "index": 7
-                },
-                {
-                    "start": 15.47,
-                    "confidence": 0.78,
-                    "end": 15.59,
-                    "word": "when",
-                    "punct": "when",
-                    "index": 8
-                },
-                {
-                    "start": 15.68,
-                    "confidence": 0.98,
-                    "end": 15.84,
-                    "word": "i",
-                    "punct": "I",
-                    "index": 9
-                },
-                {
-                    "start": 15.86,
-                    "confidence": 1,
-                    "end": 16.19,
-                    "word": "asked",
-                    "punct": "asked",
-                    "index": 10
-                },
-                {
-                    "start": 16.19,
-                    "confidence": 0.95,
-                    "end": 16.28,
-                    "word": "a",
-                    "punct": "a",
-                    "index": 11
-                },
-                {
-                    "start": 16.28,
-                    "confidence": 1,
-                    "end": 16.65,
-                    "word": "friend",
-                    "punct": "friend",
-                    "index": 12
-                },
-                {
-                    "start": 16.65,
-                    "confidence": 1,
-                    "end": 16.74,
-                    "word": "to",
-                    "punct": "to",
-                    "index": 13
-                },
-                {
-                    "start": 16.74,
-                    "confidence": 1,
-                    "end": 17.2,
-                    "word": "hold",
-                    "punct": "hold",
-                    "index": 14
-                },
-                {
-                    "start": 17.23,
-                    "confidence": 0.88,
-                    "end": 17.33,
-                    "word": "a",
-                    "punct": "a",
-                    "index": 15
-                },
-                {
-                    "start": 17.33,
-                    "confidence": 1,
-                    "end": 17.63,
-                    "word": "baby",
-                    "punct": "baby",
-                    "index": 16
-                },
-                {
-                    "start": 17.63,
-                    "confidence": 1,
-                    "end": 18.14,
-                    "word": "dinosaur",
-                    "punct": "dinosaur",
-                    "index": 17
-                },
-                {
-                    "start": 18.14,
-                    "confidence": 0.98,
-                    "end": 18.59,
-                    "word": "robot",
-                    "punct": "robot",
-                    "index": 18
-                },
-                {
-                    "start": 18.72,
-                    "confidence": 1,
-                    "end": 19.17,
-                    "word": "upside",
-                    "punct": "upside",
-                    "index": 19
-                },
-                {
-                    "start": 19.17,
-                    "confidence": 1,
-                    "end": 19.58,
-                    "word": "down",
-                    "punct": "down.",
-                    "index": 20
-                },
-                {
-                    "start": 21.83,
-                    "confidence": 0.61,
-                    "end": 21.9,
-                    "word": "it",
-                    "punct": "It",
-                    "index": 21
-                },
-                {
-                    "start": 21.95,
-                    "confidence": 0.95,
-                    "end": 22.09,
-                    "word": "was",
-                    "punct": "was",
-                    "index": 22
-                },
-                {
-                    "start": 22.1,
-                    "confidence": 0.38,
-                    "end": 22.22,
-                    "word": "a",
-                    "punct": "a",
-                    "index": 23
-                },
-            ]}}
+                }]}}
 
     const customTheme = {
         primaryColor: 'blue',
@@ -288,12 +124,12 @@ function Video() {
               </div>
           </Contents>
         </QuestionBox>
-        <VideoInfo>Frontend | 2023.05.12 금요일 | 34분 23초</VideoInfo>
+        <VideoInfo>{videodata.category} | {videodata.date}</VideoInfo>
         <TranscriptEditor
         className="custom-transcript-editor"
         theme={customTheme}
         transcriptData={json}
-        mediaUrl={dummy.url}
+        mediaUrl={videodata.url}
         sttJsonType={"bbckaldi"}
         // isEditable={true}
         />
