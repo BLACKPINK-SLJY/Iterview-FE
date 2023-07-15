@@ -14,8 +14,7 @@ const SearchBar = () => {
     const [isSuccess, setIsSuccess] = useState(true);
     const navigate = useNavigate();
     const [user, setUser] = useRecoilState(UserState);
-    
-    console.log(search)
+
     const input = useRef();
 
     const shouldSendHeader = !!user;
