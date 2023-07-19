@@ -23,7 +23,11 @@ function Mypage(props) {
     const [inMypage, setInMypage] = useState(true);
     const [question, setQuestion] = useRecoilState(QuestionState);
     const [isAnswer, setIsAnswer] = useRecoilState(AnsweredState);
+    const [filteredContents, setFilteredContents] = useState(contents);
     const navigate = useNavigate();
+    
+    const [selectedDropDownValue, setSelectedDropDownValue] = useState("최신 순");
+    const [selectedRoleDropDownValue, setSelectedRoleDropDownValue] = useState("전체");
 
     const shouldSendHeader = !!user;
 
@@ -36,6 +40,7 @@ function Mypage(props) {
     
     const getMySol = (text) => {
         setMySol(text);
+
         if(mysol) {
             setInMypage(true);
         }
@@ -72,6 +77,7 @@ function Mypage(props) {
         .then((res) => {
             setRecent(res.data.data);
             setContents(res.data.data);
+            setFilteredContents(res.data.data)
         })
     }
 
@@ -88,19 +94,127 @@ function Mypage(props) {
         .then((res) => {
             setRecent(res.data.data);
             setContents(res.data.data);
+            setFilteredContents(res.data.data)
         })
     }
 
-    const questionArr = [...contents];
-    const levelArr = questionArr.sort((a,b) => a.level - b.level);
-    const favoriteArr = questionArr.sort((a, b) => b.entireBookmarkedCount - a.entireBookmarkedCount);
+    const questionArr = [...filteredContents];
+    const levelArr = Array.from(questionArr).sort((a,b) => a.level - b.level);
+    const favoriteArr = Array.from(questionArr).sort((a, b) => b.entireBookmarkedCount - a.entireBookmarkedCount);
 
     const handleDropDown = (selectedValue) => {
-            if(selectedValue === '난이도 낮은 순') setContents(levelArr);
-            else if (selectedValue === '난이도 높은 순') setContents(levelArr.reverse());
-            else if(selectedValue === '인기 순') setContents(favoriteArr);
-            else if(selectedValue === '최신 순') setContents(recent);
+      console.log(contents);
+
+      if (selectedValue === '난이도 낮은 순') {
+        const updatedLevelArr = Array.from(questionArr).sort((a, b) => a.level - b.level);
+        setFilteredContents(updatedLevelArr);
+      }
+      else if (selectedValue === '난이도 높은 순') {
+        const updatedLevelArr = Array.from(levelArr).sort((a, b) => b.level - a.level);
+        setFilteredContents(updatedLevelArr);
+      }
+      else if (selectedValue === '인기 순') {
+        const updatedFavoriteArr = Array.from(favoriteArr).sort((a, b) => b.entireBookmarkedCount - a.entireBookmarkedCount);
+        setFilteredContents(updatedFavoriteArr);
+      }
+      else if (selectedValue === '최신 순') {
+        setFilteredContents(recent);
+      }
+    
+      setSelectedDropDownValue(selectedValue);
         }
+
+        const handleRole = (selectedRole, selectValue) => {
+          if (selectedRole === "Frontend") {
+            if (selectValue === '최신 순') {
+              setFilteredContents(recent.filter((item) => item.category === "FE"));
+            }
+            else if (selectValue === '난이도 낮은 순') {
+              const updatedLevelArr = Array.from(contents).filter((item) => item.category === "FE").sort((a, b) => a.level - b.level);
+              setFilteredContents(updatedLevelArr);
+            }
+            else if (selectValue === '난이도 높은 순') {
+              const updatedLevelArr = Array.from(contents).filter((item) => item.category === "FE").sort((a, b) => b.level - a.level);
+              setFilteredContents(updatedLevelArr);
+            }
+            else if (selectValue === '인기 순') {
+              const updatedFavoriteArr = Array.from(contents).filter((item) => item.category === "FE").sort((a, b) => b.entireBookmarkedCount - a.entireBookmarkedCount);
+              setFilteredContents(updatedFavoriteArr);
+            }
+          }
+          else if (selectedRole === "Backend") {
+            if (selectValue === '최신 순') {
+              setFilteredContents(recent.filter((item) => item.category === "BE"));
+            }
+            else if (selectValue === '난이도 낮은 순') {
+              const updatedLevelArr = Array.from(contents).filter((item) => item.category === "BE").sort((a, b) => a.level - b.level);
+              setFilteredContents(updatedLevelArr);
+            }
+            else if (selectValue === '난이도 높은 순') {
+              const updatedLevelArr = Array.from(contents).filter((item) => item.category === "BE").sort((a, b) => b.level - a.level);
+              setFilteredContents(updatedLevelArr);
+            }
+            else if (selectValue === '인기 순') {
+              const updatedFavoriteArr = Array.from(contents).filter((item) => item.category === "BE").sort((a, b) => b.entireBookmarkedCount - a.entireBookmarkedCount);
+              setFilteredContents(updatedFavoriteArr);
+            }
+          }
+          else if (selectedRole === "Android") {
+            if (selectValue === '최신 순') {
+              setFilteredContents(recent.filter((item) => item.category === "AOS"));
+            }
+            else if (selectValue === '난이도 낮은 순') {
+              const updatedLevelArr = Array.from(contents).filter((item) => item.category === "AOS").sort((a, b) => a.level - b.level);
+              setFilteredContents(updatedLevelArr);
+            }
+            else if (selectValue === '난이도 높은 순') {
+              const updatedLevelArr = Array.from(contents).filter((item) => item.category === "AOS").sort((a, b) => b.level - a.level);
+              setFilteredContents(updatedLevelArr);
+            }
+            else if (selectValue === '인기 순') {
+              const updatedFavoriteArr = Array.from(contents).filter((item) => item.category === "AOS").sort((a, b) => b.entireBookmarkedCount - a.entireBookmarkedCount);
+              setFilteredContents(updatedFavoriteArr);
+            }
+          }
+          else if (selectedRole === "iOS") {
+            if (selectValue === '최신 순') {
+              setFilteredContents(recent.filter((item) => item.category === "IOS"));
+            }
+            else if (selectValue === '난이도 낮은 순') {
+              const updatedLevelArr = Array.from(contents).filter((item) => item.category === "IOS").sort((a, b) => a.level - b.level);
+              setFilteredContents(updatedLevelArr);
+            }
+            else if (selectValue === '난이도 높은 순') {
+              const updatedLevelArr = Array.from(contents).filter((item) => item.category === "IOS").sort((a, b) => b.level - a.level);
+              setFilteredContents(updatedLevelArr);
+            }
+            else if (selectValue === '인기 순') {
+              const updatedFavoriteArr = Array.from(contents).filter((item) => item.category === "IOS").sort((a, b) => b.entireBookmarkedCount - a.entireBookmarkedCount);
+              setFilteredContents(updatedFavoriteArr);
+            }
+          }
+          else if (selectedRole === "전체") {
+            if (selectValue === '최신 순') {
+              setFilteredContents(recent.filter((item) => item.category === "IOS"));
+            }
+            else if (selectValue === '난이도 낮은 순') {
+              const updatedLevelArr = Array.from(contents).sort((a, b) => a.level - b.level);
+              setFilteredContents(updatedLevelArr);
+            }
+            else if (selectValue === '난이도 높은 순') {
+              const updatedLevelArr = Array.from(contents).sort((a, b) => b.level - a.level);
+              setFilteredContents(updatedLevelArr);
+            }
+            else if (selectValue === '인기 순') {
+              const updatedFavoriteArr = Array.from(contents).sort((a, b) => b.entireBookmarkedCount - a.entireBookmarkedCount);
+              setFilteredContents(updatedFavoriteArr);
+            }
+          }
+        
+          setSelectedRoleDropDownValue(selectedRole);
+        
+          }
+          
 
     const handleGoAnswer = (questionId) => {
         navigate(`/mypage/${user.account}/${questionId}`);
@@ -116,14 +230,14 @@ function Mypage(props) {
         <BtnFlex>
         <MypageToggle getMySol={getMySol}/>
         <div style={{display: "flex", gap:"16px", alignItems: "end"}}>
-        <MyPageDropDownBtn handleDropDown={(selectedValue) => handleDropDown(selectedValue)} />
-        <DropDownRole />
+        <MyPageDropDownBtn handleDropDown={(selectedValue) => handleDropDown(selectedValue)} mysol={inMypage}/>
+        <DropDownRole handleRole={(selectedRole) => handleRole(selectedRole, selectedDropDownValue)} mysol={inMypage} />
         </div>
         </BtnFlex>
         {mysol ?
-        <QuestionBtn contents={contents} inmypage={inMypage} handleGoAnswer={handleGoAnswer} mysol={mysol}/>
+        <QuestionBtn contents={filteredContents} inmypage={inMypage} handleGoAnswer={handleGoAnswer} mysol={mysol}/>
         :
-        <QuestionBtn contents={contents} inmypage={inMypage} />
+        <QuestionBtn contents={filteredContents} inmypage={inMypage} />
         }
     </Container>
     <br/>

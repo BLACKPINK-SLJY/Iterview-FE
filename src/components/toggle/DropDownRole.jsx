@@ -1,14 +1,28 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import { styled, css } from 'styled-components';
 import colors from '../../style/color';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import useDetectClose from '../nav/useDetectClose';
 
-function DropDownRole() {
+function DropDownRole(props) {
     const [selectIsOpen, selectRef, selectHandler] = useDetectClose(false)
     const [selectedText, setSelectedText] = useState("전체");
+    
+    const {handleRole, mysol} = props;
 
+    useEffect(() => {
+      setSelectedText("전체");
+    },[mysol])
+
+    useEffect(() => {
+      
+    }, [selectedText])
+
+    const handleLi = (selectedRole) => {
+      handleRole(selectedRole);
+      setSelectedText(selectedRole);
+    }
   return (
     <>
         <DropdownContainer>
@@ -18,20 +32,20 @@ function DropDownRole() {
             </DropDownSelect>
             <DropDownMenu isDropped={selectIsOpen}>
                 <Ul>
-                    <li onClick={() => setSelectedText("전체")} style={{cursor:'pointer'}}>
+                    <li onClick={() => handleLi("전체")} style={{cursor:'pointer'}}>
                         <LinkWrapper>전체</LinkWrapper>
                     </li>
-                    <li onClick={() => setSelectedText("Frontend")} style={{cursor:'pointer'}}>
+                    <li onClick={() => handleLi("Frontend")} style={{cursor:'pointer'}}>
                         <LinkWrapper>Frontend</LinkWrapper>
                     </li>
-                    <li onClick={() => setSelectedText("Backend")} style={{cursor:'pointer'}}>
+                    <li onClick={() => handleLi("Backend")} style={{cursor:'pointer'}}>
                         <LinkWrapper>Backend</LinkWrapper>
                     </li>
-                    <li onClick={() => setSelectedText("Android")} style={{cursor:'pointer'}}>
+                    <li onClick={() => handleLi("Android")} style={{cursor:'pointer'}}>
                         <LinkWrapper>Android</LinkWrapper>
                     </li>
-                    <li onClick={() => setSelectedText("ios")} style={{cursor:'pointer'}}>
-                        <LinkWrapper>ios</LinkWrapper>
+                    <li onClick={() => handleLi("iOS")} style={{cursor:'pointer'}}>
+                        <LinkWrapper>iOS</LinkWrapper>
                     </li>
                 </Ul>
             </DropDownMenu>

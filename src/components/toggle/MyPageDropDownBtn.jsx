@@ -4,14 +4,22 @@ import colors from '../../style/color';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import useDetectClose from '../nav/useDetectClose';
+import { useEffect } from 'react';
 
-function DropDownBtn({handleDropDown}) {
+function DropDownBtn(props) {
     const [selectIsOpen, selectRef, selectHandler] = useDetectClose(false)
     const [selectedText, setSelectedText] = useState("최신 순");
+    const {handleDropDown, mysol} = props;
+    const [selectedDropDownValue, setSelectedDropDownValue] = useState("최신 순");
 
+    useEffect(() => {
+      setSelectedText("최신 순");
+    },[mysol])
+    
     const handleLi = (selectedValue) => {
       handleDropDown(selectedValue);
       setSelectedText(selectedValue);
+      setSelectedDropDownValue(selectedValue);
     }
 
   return (
