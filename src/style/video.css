@@ -145,6 +145,7 @@
     background: #FFFFFF;
     box-shadow: 0px 0px 12.92px rgba(0, 0, 0, 0.1);
     border-radius: 14.16px;
+    overflow: scroll;
 }
 
 ._1z93WMKhmx9r9e9ig0ORDx {
@@ -242,3 +243,11 @@ input[type="range" i]::-webkit-slider-thumb {
 ._3Yzz5SC0aWv6XsLwxfjSEh .svg-inline--fa {
     transform: scaleX(1.5) scaleY(1.5);
 }
+._3QPtbUi5LjfOSFZE2FUVpO {
+    line-height: 30px;
+}
+.DraftEditor-editorContainer span {
+    background-color: transparent !important;
+    text-shadow: 0 0 0.01px black;
+  }
+  
