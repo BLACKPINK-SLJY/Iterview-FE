@@ -18,6 +18,7 @@ const Recorder = ((props) => {
   const [running, setRunning] = useState(false);
   const {isNum, isquestionId, isRandomId, execute} = props;
   const [doneRecord, setDoneRecord] = useRecoilState(AnsweredState);
+  const [shouldStartRecording, setShouldStartRecording] = useState(false);
 
   let today = new Date();
   let time = {
@@ -44,12 +45,27 @@ const Recorder = ((props) => {
 
   useEffect(() => {
     recordWebcam.close();
-    const timer = setTimeout(() => {
+    const openTimer = setTimeout(() => {
       recordWebcam.open();
+      setShouldStartRecording(true);
     }, 5000);
-
-    return () => clearTimeout(timer);
-  }, [isNum])
+  
+    return () => clearTimeout(openTimer);
+  }, [isNum]);
+  
+  useEffect(() => {
+    if (recordWebcam.status === 'OPEN' && !recordWebcam.recording && shouldStartRecording) {
+      const startTimer = setTimeout(() => {
+        recordWebcam.start();
+        startTime();
+        setTimeout(() => {
+          setAlert(true);
+        }, 60000);
+      });
+      
+      return () => clearTimeout(startTimer);
+    }
+  }, [isNum, recordWebcam.status, recordWebcam.recording]);
 
   useEffect(()=> {
     let intervalId;
@@ -57,8 +73,7 @@ const Recorder = ((props) => {
     if (running) {
       intervalId = setInterval(() => {
         setIsMinute((prevMinute) => prevMinute + 1);
-        console.log(isminute);
-      }, 10000);
+      }, 60000);
     }
     return () => {
       clearInterval(intervalId);
@@ -76,16 +91,7 @@ const Recorder = ((props) => {
   }, [isquestionId, isRandomId])
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [ModalQuestion, setModalQuestion] = useState([]);
-  const [filename, setFilename] = useState(`${timestring}.webm`);
-  const [questionId, setQuestionId] = useState(props.questionkey);
   const [transcript, setTranscript] = useState("");
-
-  const getRecordingFile = async () => {
-    const blob = recordWebcam.getRecording();
-
-    console.log({ blob });
-  };
 
   const getBlob = async (blob) => {
     console.log({ blob });
@@ -126,7 +132,7 @@ const Recorder = ((props) => {
     startTime();
     setTimeout(() => {
       setAlert(true);
-    }, 10000);
+    }, 60000);
   }
 
   const onClickRecordStop = () => {
@@ -135,9 +141,25 @@ const Recorder = ((props) => {
     setDoneRecord(true);
   }
 
-  const onClickRecordOpen = () => {
-    recordWebcam.open();
-    stopTime();
+  const onClickRecordRestart = () => {
+    if (recordWebcam.status !== 'OPEN') {
+      recordWebcam.open();
+      stopTime();
+    } else if (recordWebcam.status === 'OPEN' && recordWebcam.recording === false) {
+      setShouldStartRecording(true);
+      startTime();
+      setTimeout(() => {
+        setAlert(true);
+      }, 60000);
+    }
+  }
+
+  const onClickCameraOpen = () => {
+    if (recordWebcam.status !== 'OPEN') {
+      recordWebcam.open();
+      stopTime();
+      setShouldStartRecording(false);
+    }
   }
 
   const onClickRecordClose = () => {
@@ -254,7 +276,7 @@ const Recorder = ((props) => {
           </RecorderBtnStyle>
           <RecorderBtnStyle
             disabled={recordWebcam.status === "CLOSED"}
-            onClick={onClickRecordOpen}
+            onClick={onClickRecordRestart}
           >
             다시 녹화
           </RecorderBtnStyle>
@@ -264,7 +286,7 @@ const Recorder = ((props) => {
               recordWebcam.status === "RECORDING" ||
               recordWebcam.status === "PREVIEW"
             }
-            onClick={onClickRecordOpen}
+            onClick={onClickCameraOpen}
           >
             카메라 켜기
           </RecorderBtnStyle>
