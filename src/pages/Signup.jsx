@@ -35,7 +35,6 @@ function Signup() {
               password: password,
         })
         .then((res) => {
-            console.log(res);
             if(res.data.status === 40106) {
                 alert("이미 사용중인 계정입니다.");
             }
