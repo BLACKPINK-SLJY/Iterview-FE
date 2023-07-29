@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import { RecordWebcam, useRecordWebcam } from "react-record-webcam";
+import { useRecordWebcam } from "react-record-webcam";
 import './style.css';
 import styled, {keyframes} from "styled-components";
 import colors from '../../style/color';
@@ -8,17 +8,22 @@ import axios from "axios";
 import { useRecoilState } from 'recoil';
 import { AnsweredState, ClickedState } from "../../recoil/QuestionState";
 import { BaseUrl } from '../../privateKey';
+import { postRefreshToken } from "../../instance/apis";
+import { UserState } from '../../recoil/userState';
+import { useNavigate } from 'react-router-dom';
 
 
 const Recorder = ((props) => {
   const [selected, setSelected] = useRecoilState(ClickedState);
-  const [isUrl, setIsUrl] = useState("");
-  const [alert, setAlert] = useState(false);
+  const [boolalert, setAlert] = useState(false);
   let [isminute, setIsMinute] = useState(0);
   const [running, setRunning] = useState(false);
   const {isNum, isquestionId, isRandomId, execute} = props;
   const [doneRecord, setDoneRecord] = useRecoilState(AnsweredState);
   const [shouldStartRecording, setShouldStartRecording] = useState(false);
+  const [user, setUser] = useRecoilState(UserState);
+  const navigate = useNavigate();
+  const [alertShown, setAlertShown] = useState(false);
 
   let today = new Date();
   let time = {
@@ -90,23 +95,7 @@ const Recorder = ((props) => {
     setDoneRecord(false);
   }, [isquestionId, isRandomId])
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [transcript, setTranscript] = useState("");
-
-  const getBlob = async (blob) => {
-    console.log({ blob });
-  };
-
-  const onClickVideoModal = () => {
-    setIsModalOpen(true);
-  }
-
-  const onClickCloseModal = () => {
-    setIsModalOpen((prev) => !prev);
-    setTranscript("");
-  }
-
-  const isalert = alert && recordWebcam.status === "RECORDING";
+  const isalert = boolalert && recordWebcam.status === "RECORDING";
 
   const startTime = () => {
     setIsMinute(0);
@@ -169,8 +158,6 @@ const Recorder = ((props) => {
 
   const handleSubmitAnswer = async () => {
     const isblob = await recordWebcam.getRecording({type: "video/webm"});
-
-    getBlob(isblob);
     if(selected.length > 0) {
     axios
       .get(`${BaseUrl}/answer/presigned-url/upload?questionId=${isquestionId}`, {
@@ -179,20 +166,54 @@ const Recorder = ((props) => {
         },
       })
       .then((res) => {
-        console.log(res.data.data.presignedUrl);
-        axios
-        .put(res.data.data.presignedUrl,
-          isblob,
-          {
-          headers: { "Content-Type": "video/webm" }
-          },
-        )
-        .then((res) => {
-          console.log()
-          console.log(res.data);
-          handleRequestdb(isquestionId);
+        if(!alertShown){
+          setAlertShown(true);
+          if (res.data.status === 40003) {
+            if (res.data.message === "엑세스 토큰의 유효기간이 만료되었습니다.") {
+              const originRequest = res.config;
+              // 리프레시 토큰 api
+              return postRefreshToken().then((refreshTokenResponse) => {
+                // 리프레시 토큰 요청이 성공할 때
+                if (refreshTokenResponse.data.status === 20001) {
+                  const newAccessToken = refreshTokenResponse.data.data.access_token;
+                  localStorage.setItem('accessToken', refreshTokenResponse.data.data.access_token);
+                  localStorage.setItem('refreshToken', refreshTokenResponse.data.data.refresh_token);
+                  axios.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`; // 수정: headers.common을 사용하여 모든 요청에 적용
+                  // 진행중이던 요청 이어서하기
+                  originRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                  return axios(originRequest);
+                }
+                // 리프레시 토큰 요청이 실패할때(리프레시 토큰도 만료되었을때 = 재로그인 안내)
+                if (refreshTokenResponse.data.status === 40004) {
+                  alert('로그인 만료, 다시 로그인해주세요.');
+                  setUser(null);
+                  navigate('/login');
+                  setAlertShown(true);
+                  throw new Error('로그인 만료, 다시 로그인해주세요.');
+                }}
+                )}
+              }}
+          return res;
         })
-      })
+        .then((res) => {
+          axios
+          .put(res.data.data.presignedUrl,
+            isblob,
+            {
+            headers: { "Content-Type": "video/webm" }
+            },
+          )
+          .then((res) => {
+            handleRequestdb(isquestionId);
+          })
+          return Promise.resolve(res);
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+        .finally(() => {
+          setAlertShown(false);
+        });
     }
     else {
       axios
@@ -202,17 +223,50 @@ const Recorder = ((props) => {
         },
       })
       .then((res) => {
-        console.log(isblob);
-        
-        axios
-        .put(res.data.data.presignedUrl, {
-          isblob
-        })
-        .then((res) => {
-          console.log(res.data);
-          handleRequestdb(isRandomId);
-        })
+        if(!alertShown){
+          setAlertShown(true);
+          if (res.data.status === 40003) {
+            if (res.data.message === "엑세스 토큰의 유효기간이 만료되었습니다.") {
+              const originRequest = res.config;
+              // 리프레시 토큰 api
+              return postRefreshToken().then((refreshTokenResponse) => {
+                // 리프레시 토큰 요청이 성공할 때
+                if (refreshTokenResponse.data.status === 20001) {
+                  const newAccessToken = refreshTokenResponse.data.data.access_token;
+                  localStorage.setItem('accessToken', refreshTokenResponse.data.data.access_token);
+                  localStorage.setItem('refreshToken', refreshTokenResponse.data.data.refresh_token);
+                  axios.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`; // 수정: headers.common을 사용하여 모든 요청에 적용
+                  // 진행중이던 요청 이어서하기
+                  originRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                  return axios(originRequest);
+                }
+                // 리프레시 토큰 요청이 실패할때(리프레시 토큰도 만료되었을때 = 재로그인 안내)
+                if (refreshTokenResponse.data.status === 40004) {
+                  alert('로그인 만료, 다시 로그인해주세요.');
+                  setUser(null);
+                  navigate('/login');
+                  throw new Error('로그인 만료, 다시 로그인해주세요.');
+                }}
+              )}
+            }}
+        return res;
       })
+        .then((res) => {
+          axios
+          .put(res.data.data.presignedUrl, {
+            isblob
+          })
+          .then((res) => {
+            handleRequestdb(isRandomId);
+          })
+          return Promise.resolve(res);
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+        .finally(() => {
+          setAlertShown(false);
+        });
     }
   }
 
@@ -224,7 +278,6 @@ const Recorder = ((props) => {
       },
     })
     .then((res) => {
-      console.log(res.data);
       handleRequestTranscribe(mode);
     })
   }
@@ -235,9 +288,6 @@ const Recorder = ((props) => {
       headers: { 
         Authorization: `Bearer ${localStorage.getItem('accessToken')}` 
       },
-    })
-    .then((res) => {
-      console.log(res.data);
     })
   }
 
@@ -327,7 +377,6 @@ const Recorder = ((props) => {
                         recordWebcam.status === "CLOSED" ||
                         recordWebcam.status === "RECORDING" ? "none" : "block"}`,
           }}
-          autoPlay
           controls
         ></Video>
         </VideoDiv>

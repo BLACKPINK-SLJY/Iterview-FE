@@ -13,6 +13,7 @@ import Footer from '../components/footer/Footer';
 import { useNavigate } from 'react-router-dom';
 import { AnsweredState, QuestionState } from '../recoil/QuestionState';
 import { BaseUrl } from '../privateKey';
+import { postRefreshToken } from '../instance/apis';
 
 function Mypage(props) {
     const [user, setUser] = useRecoilState(UserState);
@@ -25,19 +26,13 @@ function Mypage(props) {
     const [isAnswer, setIsAnswer] = useRecoilState(AnsweredState);
     const [filteredContents, setFilteredContents] = useState(contents);
     const navigate = useNavigate();
+    const [alertShown, setAlertShown] = useState(false);
     
     const [selectedDropDownValue, setSelectedDropDownValue] = useState("최신 순");
     const [selectedRoleDropDownValue, setSelectedRoleDropDownValue] = useState("전체");
 
     const shouldSendHeader = !!user;
 
-    const axiosConfig = {
-        headers: shouldSendHeader ? { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } : {},
-        params: {
-          category: iscategory,
-        },
-      };
-    
     const getMySol = (text) => {
         setMySol(text);
 
@@ -54,14 +49,55 @@ function Mypage(props) {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('accessToken')}`
             },
-        }).then((res) => setQuestion(res.data.data))
+        }).then((res) => {
+          if(!alertShown){
+          if (res.data.status === 40003) {
+            if (res.data.message === "엑세스 토큰의 유효기간이 만료되었습니다.") {
+              const originRequest = res.config;
+              // 리프레시 토큰 api
+              postRefreshToken().then((refreshTokenResponse) => {
+                // 리프레시 토큰 요청이 성공할 때
+                if (refreshTokenResponse.data.status === 20001) {
+                  const newAccessToken = refreshTokenResponse.data.data.access_token;
+                  localStorage.setItem('accessToken', refreshTokenResponse.data.data.access_token);
+                  localStorage.setItem('refreshToken', refreshTokenResponse.data.data.refresh_token);
+                  axios.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`; // 수정: headers.common을 사용하여 모든 요청에 적용
+                  // 진행중이던 요청 이어서하기
+                  originRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                  return axios(originRequest);
+                }
+                // 리프레시 토큰 요청이 실패할때(리프레시 토큰도 만료되었을때 = 재로그인 안내)
+                else if (refreshTokenResponse.data.status === 40004) {
+                  throw new Error('로그인 만료, 다시 로그인해주세요.');
+                  }
+                })
+                .catch((error) => {
+                  alert('로그인 만료, 다시 로그인해주세요.');
+                  setUser(null);
+                  navigate('/login');
+                  return;
+                });
+              }
+              }}
+          return res;
+        })
+        .then((res) => {
+          // 성공적으로 처리된 응답
+          setQuestion(res.data.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        })
 
+        if(shouldSendHeader){
         if(mysol) {
             handleAnswered();
         }
         else {
             handleBookmark();
         }
+      }
+
     }, [mysol])
 
     const handleAnswered = () => {
@@ -75,11 +111,50 @@ function Mypage(props) {
             },
         })
         .then((res) => {
-            setRecent(res.data.data);
-            setContents(res.data.data);
-            setFilteredContents(res.data.data)
+
+          if(!alertShown){
+          if (res.data.status === 40003) {
+            if (res.data.message === "엑세스 토큰의 유효기간이 만료되었습니다.") {
+              const originRequest = res.config;
+              // 리프레시 토큰 api
+              return postRefreshToken().then((refreshTokenResponse) => {
+                // 리프레시 토큰 요청이 성공할 때
+                if (refreshTokenResponse.data.status === 20001) {
+                  const newAccessToken = refreshTokenResponse.data.data.access_token;
+                  localStorage.setItem('accessToken', refreshTokenResponse.data.data.access_token);
+                  localStorage.setItem('refreshToken', refreshTokenResponse.data.data.refresh_token);
+                  axios.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`; // 수정: headers.common을 사용하여 모든 요청에 적용
+                  // 진행중이던 요청 이어서하기
+                  originRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                  return axios(originRequest);
+                }
+                // 리프레시 토큰 요청이 실패할때(리프레시 토큰도 만료되었을때 = 재로그인 안내)
+                else if (refreshTokenResponse.data.status === 40004) {
+                  throw new Error('로그인 만료, 다시 로그인해주세요.');
+                }
+              })
+              .catch((error) => {
+                console.error('리프레시 토큰 요청 실패:', error);
+                // alert('로그인 만료, 다시 로그인해주세요.');
+                // setUser(null);
+                navigate('/login');
+                return;
+              });
+            }
+              }}
+          return res;
         })
-    }
+        .then((res) => {
+          // 성공적으로 처리된 응답
+          setRecent(res.data.data);
+          setContents(res.data.data);
+          setFilteredContents(res.data.data)
+          console.log(recent);
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+      }
 
     const handleBookmark = () => {
         axios
@@ -92,9 +167,46 @@ function Mypage(props) {
             },
         })
         .then((res) => {
-            setRecent(res.data.data);
-            setContents(res.data.data);
-            setFilteredContents(res.data.data)
+          if(!alertShown){
+          if (res.data.status === 40003) {
+            if (res.data.message === "엑세스 토큰의 유효기간이 만료되었습니다.") {
+              const originRequest = res.config;
+              // 리프레시 토큰 api
+              return postRefreshToken().then((refreshTokenResponse) => {
+                // 리프레시 토큰 요청이 성공할 때
+                if (refreshTokenResponse.data.status === 20001) {
+                  const newAccessToken = refreshTokenResponse.data.data.access_token;
+                  localStorage.setItem('accessToken', refreshTokenResponse.data.data.access_token);
+                  localStorage.setItem('refreshToken', refreshTokenResponse.data.data.refresh_token);
+                  axios.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`; // 수정: headers.common을 사용하여 모든 요청에 적용
+                  // 진행중이던 요청 이어서하기
+                  originRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                  return axios(originRequest);
+                }
+                // 리프레시 토큰 요청이 실패할때(리프레시 토큰도 만료되었을때 = 재로그인 안내)
+                else if (refreshTokenResponse.data.status === 40004) {
+                  throw new Error('로그인 만료, 다시 로그인해주세요.');
+                }
+              })
+              .catch((error) => {
+                console.error('리프레시 토큰 요청 실패:', error);
+                // alert('로그인 만료, 다시 로그인해주세요.');
+                // setUser(null);
+                navigate('/login');
+                return;
+              });
+            }
+              }}
+          return res;
+        })
+        .then((res) => {
+          // 성공적으로 처리된 응답
+          setRecent(res.data.data);
+          setContents(res.data.data);
+          setFilteredContents(res.data.data)
+        })
+        .catch((err) => {
+          console.log(err);
         })
     }
 
@@ -103,8 +215,6 @@ function Mypage(props) {
     const favoriteArr = Array.from(questionArr).sort((a, b) => b.entireBookmarkedCount - a.entireBookmarkedCount);
 
     const handleDropDown = (selectedValue) => {
-      console.log(contents);
-
       if (selectedValue === '난이도 낮은 순') {
         const updatedLevelArr = Array.from(questionArr).sort((a, b) => a.level - b.level);
         setFilteredContents(updatedLevelArr);
@@ -195,7 +305,7 @@ function Mypage(props) {
           }
           else if (selectedRole === "전체") {
             if (selectValue === '최신 순') {
-              setFilteredContents(recent.filter((item) => item.category === "IOS"));
+              setFilteredContents(recent);
             }
             else if (selectValue === '난이도 낮은 순') {
               const updatedLevelArr = Array.from(contents).sort((a, b) => a.level - b.level);

@@ -10,19 +10,21 @@ import Dice from '../assets/svg/dice.svg';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
-import { ClickedState, QuestionState, ScrabedState } from '../recoil/QuestionState';
+import { ClickedState, QuestionState } from '../recoil/QuestionState';
 import axios from 'axios';
 import { UserState } from '../recoil/userState';
 import { BaseUrl } from '../privateKey';
+import { postRefreshToken } from '../instance/apis';
 
 function Question() {
     const {category} = useParams();
     const [ischoose, setIsChoose] = useState(true);
     const [questions, setQuestions] = useRecoilState(QuestionState);
     const [user, setUser] = useRecoilState(UserState);
-    const [isScrab, setIsScrab] = useRecoilState(ScrabedState);
     const [isCategory, setIsCategory] = useState('');
     const navigate = useNavigate();
+    const [alertShown, setAlertShown] = useState(false);
+
 
     const [selectedQuestionIds, setSelectedQuestionIds] = useRecoilState(ClickedState);
 
@@ -43,45 +45,125 @@ function Question() {
 
     const shouldSendHeader = !!user;
 
-    const axiosConfig = {
-        headers: shouldSendHeader ? { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } : {},
+    const [axiosConfig, setAxiosConfig] = useState({
+        headers: {},
         params: {
           category: category,
         },
-      };
+      });
     
     useEffect(() => {
         setQuestions([]);
-        if(ischoose){
-            axios
-            .get(`${BaseUrl}/question/list/order/level`, axiosConfig)
+        if (ischoose) {
+          const configWithToken = {
+            headers: shouldSendHeader ? { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } : {},
+            params: {
+              category: category,
+            },
+          };
+          setAxiosConfig(configWithToken); // axiosConfig 업데이트
+      
+          axios
+            .get(`${BaseUrl}/question/list/order/level`, axiosConfig) // 수정: 수정된 axiosConfig 사용
             .then((res) => {
-                console.log(res);
-                setQuestions(res.data.data);
+              if(!alertShown){
+              setAlertShown(true);
+              if (res.data.status === 40003) {
+                if (res.data.message === "엑세스 토큰의 유효기간이 만료되었습니다.") {
+                  const originRequest = res.config;
+                  // 리프레시 토큰 api
+                  return postRefreshToken().then((refreshTokenResponse) => {
+                    // 리프레시 토큰 요청이 성공할 때
+                    if (refreshTokenResponse.data.status === 20001) {
+                      const newAccessToken = refreshTokenResponse.data.data.access_token;
+                      localStorage.setItem('accessToken', refreshTokenResponse.data.data.access_token);
+                      localStorage.setItem('refreshToken', refreshTokenResponse.data.data.refresh_token);
+                      axios.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`; // 수정: headers.common을 사용하여 모든 요청에 적용
+                      // 진행중이던 요청 이어서하기
+                      originRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                      return axios(originRequest);
+                    }
+                    // 리프레시 토큰 요청이 실패할때(리프레시 토큰도 만료되었을때 = 재로그인 안내)
+                    if (refreshTokenResponse.data.status === 40004) {
+                      alert('로그인 만료, 다시 로그인해주세요.');
+                      setUser(null);
+                      navigate('/login');
+                      setAlertShown(true);
+                      throw new Error('로그인 만료, 다시 로그인해주세요.');
+                    }}
+                    )}
+                  }}
+              return res;
+            })
+            .then((res) => {
+              // 성공적으로 처리된 응답
+              setQuestions(res.data.data);
+              return Promise.resolve(res);
             })
             .catch((err) => {
-                console.log(err);
+              console.log(err);
             })
-        }
-        else {
-            axios.get(`${BaseUrl}/question/random`, axiosConfig)
+            .finally(() => {
+              setAlertShown(false); // 경고창이 띄워진 후에 1초 뒤에 false로 변경
+            });
+        } else {
+            const configWithToken = {
+                headers: shouldSendHeader ? { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } : {},
+                params: {
+                  category: category,
+                },
+              };
+              setAxiosConfig(configWithToken);
+          axios
+            .get(`${BaseUrl}/question/random`, axiosConfig) // 수정: 수정된 axiosConfig 사용
             .then((res) => {
-                console.log(res);
-                setQuestions(res.data.data);
+              if(!alertShown) {
+              setAlertShown(true);
+              if (res.data.status === 40003) {
+                if (res.data.message === "엑세스 토큰의 유효기간이 만료되었습니다.") {
+                  const originRequest = res.config;
+                  // 리프레시 토큰 api
+                  return postRefreshToken().then((refreshTokenResponse) => {
+                    // 리프레시 토큰 요청이 성공할 때
+                    if (refreshTokenResponse.data.status === 20001) {
+                      const newAccessToken = refreshTokenResponse.data.data.access_token;
+                      localStorage.setItem('accessToken', refreshTokenResponse.data.data.access_token);
+                      localStorage.setItem('refreshToken', refreshTokenResponse.data.data.refresh_token);
+                      axios.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`; // 수정: headers.common을 사용하여 모든 요청에 적용
+                      // 진행중이던 요청 이어서하기
+                      originRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                      return axios(originRequest);
+                    }
+                    // 리프레시 토큰 요청이 실패할때(리프레시 토큰도 만료되었을때 = 재로그인 안내)
+                    if (refreshTokenResponse.data.status === 40004) {
+                      alert('로그인 만료, 다시 로그인해주세요.');
+                      setUser(null);
+                      navigate('/login');
+                      throw new Error('로그인 만료, 다시 로그인해주세요.');
+                    }}
+                    )}
+                  }}
+              return res;
+            })
+            .then((res) => {
+              // 성공적으로 처리된 응답
+              setQuestions(res.data.data);
+              return Promise.resolve(res);
             })
             .catch((err) => {
-                console.log(err);
+              console.log(err);
             })
+            .finally(() => {
+              setAlertShown(false); // 경고창이 띄워진 후에 1초 뒤에 false로 변경
+            });
         }
-    }, [category, ischoose]);
+      }, [category, ischoose]);
 
     useEffect(() => {
-        console.log(selectedQuestionIds);
-      }, [selectedQuestionIds]);
+      }, [selectedQuestionIds, category]);
 
     useEffect(() => {
         setSelectedQuestionIds([]);
-    console.log(selectedQuestionIds);
     }, [ischoose]);
 
     useEffect(() => {
@@ -92,31 +174,116 @@ function Question() {
     }, [category])
 
     const handleRandom = () => {
+      const configWithToken = {
+        headers: shouldSendHeader ? { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } : {},
+        params: {
+          category: category,
+        },
+      };
+      setAxiosConfig(configWithToken); // axiosConfig 업데이트
+
         axios.get(`${BaseUrl}/question/random`, axiosConfig)
         .then((res) => {
-            console.log(res);
-            setQuestions(res.data.data);
+          if(!alertShown){
+          setAlertShown(true);
+          if (res.data.status === 40003) {
+            if (res.data.message === "엑세스 토큰의 유효기간이 만료되었습니다.") {
+              const originRequest = res.config;
+              // 리프레시 토큰 api
+              return postRefreshToken().then((refreshTokenResponse) => {
+                // 리프레시 토큰 요청이 성공할 때
+                if (refreshTokenResponse.data.status === 20001) {
+                  const newAccessToken = refreshTokenResponse.data.data.access_token;
+                  localStorage.setItem('accessToken', refreshTokenResponse.data.data.access_token);
+                  localStorage.setItem('refreshToken', refreshTokenResponse.data.data.refresh_token);
+                  axios.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`; // 수정: headers.common을 사용하여 모든 요청에 적용
+                  // 진행중이던 요청 이어서하기
+                  originRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                  return axios(originRequest);
+                }
+                // 리프레시 토큰 요청이 실패할때(리프레시 토큰도 만료되었을때 = 재로그인 안내)
+                if (refreshTokenResponse.data.status === 40004) {
+                  alert('로그인 만료, 다시 로그인해주세요.');
+                  setUser(null);
+                  navigate('/login');
+                  throw new Error('로그인 만료, 다시 로그인해주세요.');
+                }}
+              )}
+            }}
+        return res;
+      })
+        .then((res) => {
+          // 성공적으로 처리된 응답
+          setQuestions(res.data.data);
+          return Promise.resolve(res);
         })
         .catch((err) => {
-            console.log(err);
+          console.log(err);
         })
+        .finally(() => {
+          setAlertShown(false); // 경고창이 띄워진 후에 1초 뒤에 false로 변경
+        });
     }
 
-    const questionArr = [...questions];
+    const questionArr = [...(questions || [] )];
     const favoriteArr = questionArr.sort((a, b) => b.entireBookmarkedCount - a.entireBookmarkedCount);
 
     const handleDropDown = (selectedValue) => {
+      const configWithToken = {
+        headers: shouldSendHeader ? { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } : {},
+        params: {
+          category: category,
+        },
+      };
+      setAxiosConfig(configWithToken);
         axios
         .get(`${BaseUrl}/question/list/order/level`, axiosConfig)
         .then((res) => {
-            setQuestions(res.data.data);
-            if(selectedValue === '난이도 낮은 순') setQuestions(res.data.data);
-            else if (selectedValue === '난이도 높은 순') {
-                const reversedData = [...res.data.data].reverse();
-                setQuestions(reversedData);
-            }
-            else setQuestions(favoriteArr);
+          if(!alertShown) {
+          setAlertShown(true);
+          if (res.data.status === 40003) {
+            if (res.data.message === "엑세스 토큰의 유효기간이 만료되었습니다.") {
+              const originRequest = res.config;
+              // 리프레시 토큰 api
+              return postRefreshToken().then((refreshTokenResponse) => {
+                // 리프레시 토큰 요청이 성공할 때
+                if (refreshTokenResponse.data.status === 20001) {
+                  const newAccessToken = refreshTokenResponse.data.data.access_token;
+                  localStorage.setItem('accessToken', refreshTokenResponse.data.data.access_token);
+                  localStorage.setItem('refreshToken', refreshTokenResponse.data.data.refresh_token);
+                  axios.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`; // 수정: headers.common을 사용하여 모든 요청에 적용
+                  // 진행중이던 요청 이어서하기
+                  originRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                  return axios(originRequest);
+                }
+                // 리프레시 토큰 요청이 실패할때(리프레시 토큰도 만료되었을때 = 재로그인 안내)
+                if (refreshTokenResponse.data.status === 40004) {
+                  alert('로그인 만료, 다시 로그인해주세요.');
+                  setUser(null);
+                  navigate('/login');
+                  throw new Error('로그인 만료, 다시 로그인해주세요.');
+                }}
+                )}
+              }}
+          return res;
         })
+        .then((res) => {
+          // 성공적으로 처리된 응답
+          setQuestions(res.data.data);
+          if(selectedValue === '난이도 낮은 순') setQuestions(res.data.data);
+          else if (selectedValue === '난이도 높은 순') {
+              const reversedData = [...res.data.data].reverse();
+              setQuestions(reversedData);
+          }
+          else setQuestions(favoriteArr);
+          return Promise.resolve(res);
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+        .finally(() => {
+          setAlertShown(false); // 경고창이 띄워진 후에 1초 뒤에 false로 변경
+        });
     }
 
   return (
@@ -149,7 +316,7 @@ function Question() {
         {ischoose ?
         <GoTestBtn disabled={selectedQuestionIds.length === 0} onClick={() => navigate('/interview')}>면접 보기 ({selectedQuestionIds.length})</GoTestBtn>
         :
-        <GoTestBtn disabled={false} onClick={() => navigate('/interview')}>면접 보기</GoTestBtn>
+        <GoTestBtn disabled={!user} onClick={() => navigate('/interview')}>면접 보기</GoTestBtn>
         }
     </Container>
     <Footer />

@@ -10,19 +10,24 @@ import { ClickedState } from '../recoil/QuestionState';
 import { useEffect } from 'react';
 import Footer from '../components/footer/Footer';
 import colors from '../style/color';
+import { UserState } from '../recoil/userState';
+import NotAccess from './NotAccess';
 
 function Search() {
+    const [user, setUser] = useRecoilState(UserState);
     const [clickedQuestion, setclickedQuestion] = useRecoilState(ClickedState);
     const location = useLocation();
     const navigate = useNavigate();
-    const search = location.state.content;
-    const [result, setResult] = useState(location.state.searchResult);
+    const search = location.state?.content;
+    const [result, setResult] = useState(location.state?.searchResult);
     const [ischoose, setIsChoose] = useState(true);
 
     useEffect(() => {
-        setResult(location.state.searchResult.sort((a,b) => a.level - b.level));
-        setclickedQuestion([]);
-      }, [location.state.searchResult]);
+        if(result){
+          setResult(location.state.searchResult.sort((a,b) => a.level - b.level));
+          setclickedQuestion([]);
+        }
+      }, [location.state?.searchResult]);
 
 
 
@@ -39,7 +44,7 @@ function Search() {
         });
       };
 
-      const questionArr = [...result];
+      const questionArr = [...(result || [])];
       const favoriteArr = questionArr.sort((a, b) => b.entireBookmarkedCount - a.entireBookmarkedCount);
   
       const handleDropDown = (selectedValue) => {
@@ -53,6 +58,8 @@ function Search() {
           }
 
   return (
+    <>
+    {user ?
     <>
     <Nav/>
     <Container>
@@ -83,6 +90,13 @@ function Search() {
     <br/>
     <br/>
     <Footer />
+    </>
+    :
+    <>
+    <Nav />
+    <NotAccess/>
+    </>
+    }
     </>
   )
 }

@@ -18,6 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import { UserState } from '../recoil/userState';
 import { axios } from 'axios';
 import Mp3 from '../assets/mp3/test.mp3';
+import NotAccess from './NotAccess';
 
 function Test() {
     const [selected, setSelected] = useRecoilState(ClickedState);
@@ -67,8 +68,6 @@ function Test() {
             setIsRandomId(questions[isNum+1].questionId);
         }
         setIsCount(isCount+1);
-        console.log(isNum);
-        console.log(isCount);
     }
 
     const onClickCloseModal = () => {
@@ -77,105 +76,114 @@ function Test() {
 
   return (
     <>
-    <Nav />
-    <Container>
-        <QuestionBox>
-            <Header>
-            {selected.length > 0 ? 
-                <QuestionText>
-                    <QImgStyle src={QImg} />
-                        {istitle}
-                </QuestionText>
-                :
-                <QuestionText>
-                    <QImgStyle src={QImg} />
-                        {isRandomTitle}
-                </QuestionText>
-            }
-            </Header>
-        </QuestionBox>
-        {selected.length > 0 ?
-            <Recorder execute={execute} isquestionId={isquestionId} isSubmitModal={isSubmitModal} isNum={isNum}/>
-            :
-            <Recorder execute={execute} isRandomId={isRandomId} isNum={isNum}/>
-        }
-        <EndSubmitLayout>
-          <EndBtn onClick={onClickCloseModal}>종료하기</EndBtn>
-          <TextStyle>{isCount}
-            {selected.length > 0 ?
-                        <TextStyle2> / {selected.length}</TextStyle2>
-                        :
-                        <TextStyle2> / {questions.length}</TextStyle2>
-            }
-          </TextStyle>
-          <SubmitBtn onClick={handleSubmitAnswer} disabled={isDisabled}>제출하기</SubmitBtn>
-        </EndSubmitLayout>
-    </Container>
-    <Footer />
-    {isSubmitModal &&
-        <Modal>
-            <ModalContainer>
-                <QuestionContain>
-                    <QImgStyle src={QImg} />
-                    {selected.length > 0 ?
-                        <div style={{textAlign:"left"}}>
+    {user ?
+    <>
+        <Nav />
+        <Container>
+            <QuestionBox>
+                <Header>
+                {selected.length > 0 ? 
+                    <QuestionText>
+                        <QImgStyle src={QImg} />
                             {istitle}
-                        </div>
+                    </QuestionText>
                     :
-                        <div style={{textAlign:"left"}}>
+                    <QuestionText>
+                        <QImgStyle src={QImg} />
                             {isRandomTitle}
-                        </div>
-                    }
-                </QuestionContain>
-                <div style={{marginTop:"27px", fontStyle:"normal", fontSize:"20px", fontWeight:"500", color:"#787879"}}>모범 답변 키워드</div>
-                <TagContain>
-                    {selected.length > 0 ?
-                        <Keywords clickedTest={clickedTest[isNum]}/>
-                        :
-                        <Keywords clickedTest={questions[isNum]}/>
-                    }
-                </TagContain>
-                { selected.length > 0 && isCount === selected.length ?
-                <>
-                    <div style={{fontWeight: "500", fontSize: "20px", color: "#424344"}}>
-                        모든 질문이 종료되었습니다. 답변을 확인하러 가시겠습니까?
-                    </div>
-                    <div style={{display: "flex", marginTop: "40px", justifyContent: "center", gap:"22px"}}>
-                        <NoBtn onClick={() => navigate(`/question/${iscategory}`)}>아니요</NoBtn>
-                        <ModalNextBtn onClick={() => navigate(`/mypage/${user.account}`)}>내 답변 확인하기</ModalNextBtn>
-                    </div>
-                </>
-                : selected.length <= 0 && isCount === questions.length ?
-                <>
-                    <div style={{fontWeight: "500", fontSize: "20px", color: "#424344"}}>
-                        모든 질문이 종료되었습니다. 답변을 확인하러 가시겠습니까?
-                    </div>
-                    <div style={{display: "flex", marginTop: "40px", justifyContent: "center", gap:"22px"}}>
-                        <NoBtn onClick={() => navigate(`/question/${iscategory}`)}>아니요</NoBtn>
-                        <ModalNextBtn onClick={() => navigate(`/mypage/${user.account}`)}>내 답변 확인하기</ModalNextBtn>
-                    </div>
-                </>
-                :
-                <>
-                    <ModalNextBtn onClick={onClickNextModal}>다음 질문</ModalNextBtn>
-                    <ModalCompleteText><Smallcheck src={SmallCheck} />답변이 제출되었습니다.</ModalCompleteText>
-                </>
+                    </QuestionText>
                 }
-            </ModalContainer>
-        </Modal>}
-        {isCloseModal && 
-        <Modal>
-            <ModalContainer>
-                    <div style={{fontWeight: "500", fontSize: "20px", color: "#424344", paddingTop:"40px", paddingBottom:"40px"}}>
-                        종료하기를 누르시면 면접이 종료됩니다. 정말로 면접을 나가시겠습니까?
-                    </div>
-                    <div style={{display: "flex", paddingBottom:"40px", justifyContent:"center", gap:"25px"}}>
-                    <NoBtn onClick={() => setIsCloseModal(false)}>아니요</NoBtn>
-                    <ModalNextBtn onClick={() => navigate(`/question/${iscategory}`)}>네</ModalNextBtn>
-                    </div>
-            </ModalContainer>
-        </Modal>
-        }
+                </Header>
+            </QuestionBox>
+            {selected.length > 0 ?
+                <Recorder execute={execute} isquestionId={isquestionId} isSubmitModal={isSubmitModal} isNum={isNum}/>
+                :
+                <Recorder execute={execute} isRandomId={isRandomId} isNum={isNum}/>
+            }
+            <EndSubmitLayout>
+              <EndBtn onClick={onClickCloseModal}>종료하기</EndBtn>
+              <TextStyle>{isCount}
+                {selected.length > 0 ?
+                            <TextStyle2> / {selected.length}</TextStyle2>
+                            :
+                            <TextStyle2> / {questions.length}</TextStyle2>
+                }
+              </TextStyle>
+              <SubmitBtn onClick={handleSubmitAnswer} disabled={isDisabled}>제출하기</SubmitBtn>
+            </EndSubmitLayout>
+        </Container>
+        <Footer />
+        {isSubmitModal &&
+            <Modal>
+                <ModalContainer>
+                    <QuestionContain>
+                        <QImgStyle src={QImg} />
+                        {selected.length > 0 ?
+                            <div style={{textAlign:"left"}}>
+                                {istitle}
+                            </div>
+                        :
+                            <div style={{textAlign:"left"}}>
+                                {isRandomTitle}
+                            </div>
+                        }
+                    </QuestionContain>
+                    <div style={{marginTop:"27px", fontStyle:"normal", fontSize:"20px", fontWeight:"500", color:"#787879"}}>모범 답변 키워드</div>
+                    <TagContain>
+                        {selected.length > 0 ?
+                            <Keywords clickedTest={clickedTest[isNum]}/>
+                            :
+                            <Keywords clickedTest={questions[isNum]}/>
+                        }
+                    </TagContain>
+                    { selected.length > 0 && isCount === selected.length ?
+                    <>
+                        <div style={{fontWeight: "500", fontSize: "20px", color: "#424344"}}>
+                            모든 질문이 종료되었습니다. 답변을 확인하러 가시겠습니까?
+                        </div>
+                        <div style={{display: "flex", marginTop: "40px", justifyContent: "center", gap:"22px"}}>
+                            <NoBtn onClick={() => navigate(`/question/${iscategory}`)}>아니요</NoBtn>
+                            <ModalNextBtn onClick={() => navigate(`/mypage/${user.account}`)}>내 답변 확인하기</ModalNextBtn>
+                        </div>
+                    </>
+                    : selected.length <= 0 && isCount === questions.length ?
+                    <>
+                        <div style={{fontWeight: "500", fontSize: "20px", color: "#424344"}}>
+                            모든 질문이 종료되었습니다. 답변을 확인하러 가시겠습니까?
+                        </div>
+                        <div style={{display: "flex", marginTop: "40px", justifyContent: "center", gap:"22px"}}>
+                            <NoBtn onClick={() => navigate(`/question/${iscategory}`)}>아니요</NoBtn>
+                            <ModalNextBtn onClick={() => navigate(`/mypage/${user.account}`)}>내 답변 확인하기</ModalNextBtn>
+                        </div>
+                    </>
+                    :
+                    <>
+                        <ModalNextBtn onClick={onClickNextModal}>다음 질문</ModalNextBtn>
+                        <ModalCompleteText><Smallcheck src={SmallCheck} />답변이 제출되었습니다.</ModalCompleteText>
+                    </>
+                    }
+                </ModalContainer>
+            </Modal>}
+            {isCloseModal && 
+            <Modal>
+                <ModalContainer>
+                        <div style={{fontWeight: "500", fontSize: "20px", color: "#424344", paddingTop:"40px", paddingBottom:"40px"}}>
+                            종료하기를 누르시면 면접이 종료됩니다. 정말로 면접을 나가시겠습니까?
+                        </div>
+                        <div style={{display: "flex", paddingBottom:"40px", justifyContent:"center", gap:"25px"}}>
+                        <NoBtn onClick={() => setIsCloseModal(false)}>아니요</NoBtn>
+                        <ModalNextBtn onClick={() => navigate(`/question/${iscategory}`)}>네</ModalNextBtn>
+                        </div>
+                </ModalContainer>
+            </Modal>
+            }
+    </>
+        :
+    <>
+    <Nav />
+    <NotAccess/>
+    </>
+    }
     </>
   )
 }

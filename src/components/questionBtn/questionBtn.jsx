@@ -11,12 +11,15 @@ import { useRecoilState } from 'recoil';
 import { UserState } from '../../recoil/userState';
 import { ScrabedState } from '../../recoil/QuestionState';
 import { BaseUrl } from '../../privateKey';
+import { useNavigate } from 'react-router-dom';
+import { postRefreshToken } from '../../instance/apis';
 
 function QuestionBtn(props) {
-  const [isClicked, setIsClicked] = useState([]);
   const { ischoose, contents, handleQuestionClick, selectedQuestionIds, inmypage, handleGoAnswer, mysol } = props;
   const [isScrab, setIsScrab] = useRecoilState(ScrabedState);
   const [user, setUser] = useRecoilState(UserState);
+  const navigate = useNavigate();
+  const [alertShown, setAlertShown] = useState(false);
 
   const shouldSendHeader = !!user;
 
@@ -27,15 +30,91 @@ function QuestionBtn(props) {
   const handleScrab = (questionId) => {
       axios.put(`${BaseUrl}/question/bookmark/${questionId}`, null, axiosConfig)
       .then((res) => {
-          setIsScrab((prevScrab) => ({ ...prevScrab, [questionId]: true }));
-      })
+        if(!alertShown){
+            setAlertShown(true);
+            if (res.data.status === 40003) {
+              if (res.data.message === "엑세스 토큰의 유효기간이 만료되었습니다.") {
+                const originRequest = res.config;
+                // 리프레시 토큰 api
+                return postRefreshToken().then((refreshTokenResponse) => {
+                  // 리프레시 토큰 요청이 성공할 때
+                  if (refreshTokenResponse.data.status === 20001) {
+                    const newAccessToken = refreshTokenResponse.data.data.access_token;
+                    localStorage.setItem('accessToken', refreshTokenResponse.data.data.access_token);
+                    localStorage.setItem('refreshToken', refreshTokenResponse.data.data.refresh_token);
+                    axios.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`; // 수정: headers.common을 사용하여 모든 요청에 적용
+                    // 진행중이던 요청 이어서하기
+                    originRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                    return axios(originRequest);
+                  }
+                  // 리프레시 토큰 요청이 실패할때(리프레시 토큰도 만료되었을때 = 재로그인 안내)
+                  if (refreshTokenResponse.data.status === 40004) {
+                    alert('로그인 만료, 다시 로그인해주세요.');
+                    setUser(null);
+                    navigate('/login');
+                    setAlertShown(true);
+                    throw new Error('로그인 만료, 다시 로그인해주세요.');
+                  }}
+                  )}
+                }}
+            return res;
+          })
+          .then((res) => {
+            // 성공적으로 처리된 응답
+            setIsScrab((prevScrab) => ({ ...prevScrab, [questionId]: true }));
+            return Promise.resolve(res);
+          })
+          .catch((err) => {
+            console.log(err);
+          })
+          .finally(() => {
+            setAlertShown(false); // 경고창이 띄워진 후에 1초 뒤에 false로 변경
+          });
   }
 
   const handleUnScrab = (questionId) => {
     axios.put(`${BaseUrl}/question/unbookmark/${questionId}`, null, axiosConfig)
     .then((res) => {
-        setIsScrab((prevScrab) => ({ ...prevScrab, [questionId]: false }));
-    })
+        if(!alertShown){
+            setAlertShown(true);
+            if (res.data.status === 40003) {
+              if (res.data.message === "엑세스 토큰의 유효기간이 만료되었습니다.") {
+                const originRequest = res.config;
+                // 리프레시 토큰 api
+                return postRefreshToken().then((refreshTokenResponse) => {
+                  // 리프레시 토큰 요청이 성공할 때
+                  if (refreshTokenResponse.data.status === 20001) {
+                    const newAccessToken = refreshTokenResponse.data.data.access_token;
+                    localStorage.setItem('accessToken', refreshTokenResponse.data.data.access_token);
+                    localStorage.setItem('refreshToken', refreshTokenResponse.data.data.refresh_token);
+                    axios.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`; // 수정: headers.common을 사용하여 모든 요청에 적용
+                    // 진행중이던 요청 이어서하기
+                    originRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                    return axios(originRequest);
+                  }
+                  // 리프레시 토큰 요청이 실패할때(리프레시 토큰도 만료되었을때 = 재로그인 안내)
+                  if (refreshTokenResponse.data.status === 40004) {
+                    alert('로그인 만료, 다시 로그인해주세요.');
+                    setUser(null);
+                    navigate('/login');
+                    setAlertShown(true);
+                    throw new Error('로그인 만료, 다시 로그인해주세요.');
+                  }}
+                  )}
+                }}
+            return res;
+          })
+          .then((res) => {
+            // 성공적으로 처리된 응답
+            setIsScrab((prevScrab) => ({ ...prevScrab, [questionId]: false }));
+            return Promise.resolve(res);
+          })
+          .catch((err) => {
+            console.log(err);
+          })
+          .finally(() => {
+            setAlertShown(false); // 경고창이 띄워진 후에 1초 뒤에 false로 변경
+          });
 }
 
   return (
@@ -43,7 +122,7 @@ function QuestionBtn(props) {
     {ischoose ?
         contents && contents.map((question) => (
             <Container key={question.questionId} isClicked={selectedQuestionIds.includes(question.questionId)}>
-            <Header onClick={() => handleQuestionClick(question.questionId)}>
+            <Header onClick={() => user ? handleQuestionClick(question.questionId) : {}}>
                   <div style={{display:"flex", width:"1050px", height:"fit-content", marginRight:"5px"}}>
                   <QImgStyle src={QImg} />
                       <div>
@@ -62,7 +141,9 @@ function QuestionBtn(props) {
                     : question.answered === 'Y' &&
                     <AnswerText>답변완료</AnswerText>
                     }
-                    {isScrab[question.questionId] ?
+                    {!user ?
+                       <></>
+                    : isScrab[question.questionId] ?
                        <ScrapImg questionId={question.questionId} onClick={() => {handleUnScrab(question.questionId)}} src={Bookmarkon} alt="bookmark" />
                     :
                        <ScrapImg questionId={question.questionId} onClick={() => {handleScrab(question.questionId)}} src={Bookmarkoff} alt="bookmark" />
@@ -104,11 +185,13 @@ function QuestionBtn(props) {
                     : question.answered === 'Y' &&
                     <AnswerText>답변완료</AnswerText>
                     }
-              {isScrab[question.questionId] ?
-                       <ScrapImg questionId={question.questionId} onClick={() => {handleUnScrab(question.questionId)}} src={Bookmarkon} alt="bookmark" />
-                    :
-                       <ScrapImg questionId={question.questionId} onClick={() => {handleScrab(question.questionId)}} src={Bookmarkoff} alt="bookmark" />
-                    }
+                {!user ?
+                    <></>
+                : isScrab[question.questionId] ?
+                    <ScrapImg questionId={question.questionId} onClick={() => {handleUnScrab(question.questionId)}} src={Bookmarkon} alt="bookmark" />
+                :
+                    <ScrapImg questionId={question.questionId} onClick={() => {handleScrab(question.questionId)}} src={Bookmarkoff} alt="bookmark" />
+                }
               </div>
           </Contents>
       </Container>
