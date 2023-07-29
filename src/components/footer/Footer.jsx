@@ -75,7 +75,7 @@ function Footer() {
                 <img src={GrayLogo} alt='Logo' />
             </GrayLogoLayout>
             <FooterFirst>
-                <FooterIterview>(주) 잇터뷰</FooterIterview>
+                <FooterIterview>2023 숭실대학교 컴퓨터학부 소프트웨어 공모전</FooterIterview>
                 <div>| ⓒ 2023 ITERVIEW INC.</div>
             </FooterFirst>
             <FooterSecond>
