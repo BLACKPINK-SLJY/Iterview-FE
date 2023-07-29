@@ -47,7 +47,6 @@ function Login() {
             })
             localStorage.setItem('accessToken', res.data.data.token.access_token);
             localStorage.setItem('refreshToken', res.data.data.token.refresh_token);
-            alert('로그인 성공!');
             navigate('/');
         })
         .catch((err) => {
