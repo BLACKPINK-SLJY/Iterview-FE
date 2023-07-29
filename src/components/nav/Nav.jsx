@@ -49,19 +49,19 @@ function Nav() {
                 <TextStyle>직무선택</TextStyle>
                 <FontAwesomeIcon icon={faAngleDown} style={{color:"white", paddingTop:"13px"}} />
                 </DropdownSelect>
-                <DropDownMenu isDropped={selectIsOpen}>
+                <DropDownMenu isdropped={selectIsOpen}>
                   <Ul>
                     <LinkWrapper>
-                      <Link to='/question/fe'>Frontend</Link>
+                      <a href='/question/fe'>Frontend</a>
                     </LinkWrapper>
                     <LinkWrapper>
-                      <Link to='/question/be'>Backend</Link>
+                      <a href='/question/be'>Backend</a>
                     </LinkWrapper>
                     <LinkWrapper>
-                      <Link to='/question/aos'>Android</Link>
+                      <a href='/question/aos'>Android</a>
                     </LinkWrapper>
                     <LinkWrapper>
-                      <Link to='/question/ios'>iOS</Link>
+                      <a href='/question/ios'>iOS</a>
                     </LinkWrapper>
                   </Ul>
                 </DropDownMenu>
@@ -77,7 +77,7 @@ function Nav() {
                   <FontAwesomeIcon icon={faAngleDown} style={{color:"white", marginLeft: "7px"}} />
                   </TextStyle>      
                 </DropdownSelect>
-                <DropDownMenu2 isDropped={myPageIsOpen}>
+                <DropDownMenu2 isdropped={myPageIsOpen}>
                   <Ul>
                     <LinkWrapper>
                       <Link to={`/mypage/${user.account}`}>My Page</Link>
@@ -136,14 +136,14 @@ const DropDownMenu = styled.div`
   z-index: 9;
   border-radius: 0px 0px 10px 10px;
 
-  ${({ isDropped }) =>
-    isDropped &&
+  ${({ isdropped }) =>
+    isdropped ?
     css`
       opacity: 1;
       visibility: visible;
       transform: translate(-50%, 0);
       left: 50%;
-    `};
+    ` : ''};
 `
 const DropDownMenu2 = styled.div`
   background-color: ${colors.black_100};
@@ -161,14 +161,14 @@ const DropDownMenu2 = styled.div`
   z-index: 9;
   border-radius: 0px 0px 10px 10px;
 
-  ${({ isDropped }) =>
-    isDropped &&
+  ${({ isdropped }) =>
+    isdropped ?
     css`
       opacity: 1;
       visibility: visible;
       transform: translate(-50%, 0);
       left: 50%;
-    `};
+    `: ""};
 `
 const LinkWrapper = styled.li`
   font-weight: 500;
