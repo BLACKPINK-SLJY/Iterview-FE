@@ -318,7 +318,7 @@ const ModalNextBtn = styled.button`
     height: 44px;
     font-weight: 700;
     font-size: 16px;
-    line-height: 17px;
+    line-height: 20px;
     color: ${colors.white_100};
     border: none;
     margin-bottom: 16px;
@@ -350,7 +350,7 @@ const TagContain = styled.div`
     align-content: center;
 `
 const NoBtn = styled.div`
-    width: 90px;
+    width: 100px;
     height: 44px;
     padding: 14px 20px 0px 20px;
     background: #666667;
@@ -358,7 +358,7 @@ const NoBtn = styled.div`
     border-radius: 33.1447px;
     font-weight: 700;
     font-size: 16px;
-    line-height: 17px;
+    line-height: 20px;
     letter-spacing: 0.05em;
     color: ${colors.white_100};
     cursor: pointer;

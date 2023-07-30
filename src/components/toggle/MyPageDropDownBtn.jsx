@@ -58,7 +58,7 @@ const DropdownContainer = styled.div`
   display: inline-block;
 `
 const DropDownSelect = styled.div`
-    width: 130px;
+    width: 150px;
     height: 36px;
     padding-left: 10px;
     padding-right: 10px;
@@ -79,7 +79,7 @@ const DropDownMenu = styled.div`
   position: absolute;
   top: 60px;
   left: 50%;
-  width: 130px;
+  width: 150px;
   height: 152px;
   text-align: center;
   opacity: 0;
@@ -105,7 +105,7 @@ const Ul = styled.ul`
   & > li {
     padding-top: 4px;
     padding-bottom: 4px;
-    width: 130px;
+    width: 150px;
   }
   list-style-type: none;
   display: flex;

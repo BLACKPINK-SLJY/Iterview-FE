@@ -29,7 +29,7 @@ const Container = styled.div`
     color: ${colors.black_80};
     font-weight: 500;
     font-size: 18.1612px;
-    line-height: 16px;
+    line-height: 15px;
     padding-left: 12px;
     padding-right: 12px;
     padding-top: 10px;

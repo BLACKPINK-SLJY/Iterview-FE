@@ -30,6 +30,17 @@ export const StyleSearchBar = styled.input`
     }
 
     box-sizing: border-box;
+
+    input::-webkit-search-decoration,
+    input::-webkit-search-cancel-button,
+    input::-webkit-search-results-button,
+    input::-webkit-search-results-decoration{
+        -webkit-appearance: none;
+    }
+
+   input.hide-clear[type=search]::-ms-clear, input.hide-clear[type=search]::-ms-reveal {
+   display:none; 
+}
 `
 
 export const MagnifierImg = styled.img`

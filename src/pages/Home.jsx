@@ -26,6 +26,7 @@ function Home() {
               <GradientText>수월하게!</GradientText>
             </Textjump>
           </TextBox>
+          <br/>
           <TextBox>
             <GradientText>최신 트렌드</GradientText>
             <NotgradientText>에 맞춰 엄선된 질문으로 면접 준비를 보다</NotgradientText>
@@ -33,6 +34,7 @@ function Home() {
               <GradientText>확실하게!</GradientText>
             </Textjump>
           </TextBox>
+          <br/>
           <ImgStyle>
             <img src={Mainillust} alt='Iterview' width="900px" />
           </ImgStyle>

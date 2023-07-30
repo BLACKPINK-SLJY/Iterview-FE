@@ -48,6 +48,9 @@ table {
 body{
   background-color: #F5F5F7;
   zoom: 70%;
+  transform : rotate(0.04deg); 
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 a{
   text-decoration: none;

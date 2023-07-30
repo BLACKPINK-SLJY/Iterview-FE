@@ -94,7 +94,7 @@ const SearchBar = () => {
         <>
             <SearchBoxStyle>
                 <StyleSearchBar
-                    type="search"
+                    type="text"
                     ref={input}
                     value={search}
                     onChange={onChangeSearch}

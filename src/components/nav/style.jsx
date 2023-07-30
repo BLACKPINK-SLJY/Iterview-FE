@@ -40,7 +40,7 @@ export const LoginButton = styled.button`
 `
 
 export const SignUpButton = styled.button`
-    width: 67px;
+    width: 76px;
     height: 32px;
 
     text-align: center;

@@ -5,7 +5,7 @@ export const ModalLayout = styled.div`
     position: fixed;
     left: 50%;
     top: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -100%);
 
     /* max-height: 50%; */
     width: 750px;

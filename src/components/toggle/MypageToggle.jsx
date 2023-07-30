@@ -41,7 +41,7 @@ const ButtonLabel = styled.label`
         display: flex;
         position: absolute;
         content: '내가 푼 문제';
-        padding-left: 1.3rem;
+        padding-left: 1rem;
         justify-content: flex-start;
         align-items: center;
         width: 108px;
