@@ -122,7 +122,7 @@ function QuestionBtn(props) {
     {ischoose ?
         contents && contents.map((question) => (
             <Container key={question.questionId} isClicked={selectedQuestionIds.includes(question.questionId)}>
-            <Header onClick={() => user ? handleQuestionClick(question.questionId) : {}}>
+            <Header onClick={() => user ? handleQuestionClick(question.questionId) : (alert("로그인 후 이용 바랍니다."), navigate('/login'))}>
                   <div style={{display:"flex", width:"1050px", height:"fit-content", marginRight:"5px"}}>
                   <QImgStyle src={QImg} />
                       <div>
@@ -136,9 +136,7 @@ function QuestionBtn(props) {
                         <Tag question={question}/>
                     </TagList>
                     <div style={{display:'flex', gap:'15px'}}>
-                    {question.answered === 'Y' && inmypage ?
-                    <AnswerText>내 답변 보기</AnswerText>
-                    : question.answered === 'Y' &&
+                    {question.answered === 'Y' &&
                     <AnswerText>답변완료</AnswerText>
                     }
                     {!user ?
@@ -165,7 +163,7 @@ function QuestionBtn(props) {
             </div>    
             </Header>
             :
-            <Header>
+            <Header onClick={() => user ? {} : (alert("로그인 후 이용 바랍니다."), navigate('/login'))}>
             <div style={{display:"flex", width:"1050px", height:"fit-content", marginRight:"5px"}}>
             <QImgStyle src={QImg} />
                 <div>
@@ -180,8 +178,8 @@ function QuestionBtn(props) {
               <Tag question={question}/>
               </TagList>
               <div style={{display:'flex', gap:'15px'}}>
-              {question.answered === 'Y' && inmypage ?
-                    <AnswerText>내 답변 보기</AnswerText>
+              {question.answered === 'Y' && mysol ?
+                    <AnswerText onClick={() => handleGoAnswer(question.questionId)}>내 답변 보기</AnswerText>
                     : question.answered === 'Y' &&
                     <AnswerText>답변완료</AnswerText>
                     }
@@ -262,4 +260,5 @@ const AnswerText = styled.div`
     -webkit-text-fill-color: transparent;
     background-clip: text;
     padding-top: 14px;
+    cursor: pointer;
 `
