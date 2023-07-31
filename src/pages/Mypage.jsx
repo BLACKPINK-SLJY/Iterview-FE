@@ -5,13 +5,13 @@ import colors from '../style/color';
 import MypageToggle from '../components/toggle/MypageToggle';
 import MyPageDropDownBtn from '../components/toggle/MyPageDropDownBtn';
 import DropDownRole from '../components/toggle/DropDownRole';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { UserState } from '../recoil/userState';
 import axios from 'axios';
 import QuestionBtn from '../components/questionBtn/questionBtn';
 import Footer from '../components/footer/Footer';
 import { useNavigate } from 'react-router-dom';
-import { AnsweredState, QuestionState } from '../recoil/QuestionState';
+import { AnsweredState, QuestionState, ScrabedState } from '../recoil/QuestionState';
 import { BaseUrl } from '../privateKey';
 import { postRefreshToken } from '../instance/apis';
 
@@ -27,9 +27,15 @@ function Mypage(props) {
     const [filteredContents, setFilteredContents] = useState(contents);
     const navigate = useNavigate();
     const [alertShown, setAlertShown] = useState(false);
+    const isScrab = useRecoilValue(ScrabedState);
+    const setScrab = useSetRecoilState(ScrabedState);
     
     const [selectedDropDownValue, setSelectedDropDownValue] = useState("최신 순");
     const [selectedRoleDropDownValue, setSelectedRoleDropDownValue] = useState("전체");
+
+    const updateScrabStatus = (dataFromServer) => {
+      setScrab(dataFromServer);
+    };
 
     const shouldSendHeader = !!user;
 
@@ -203,7 +209,9 @@ function Mypage(props) {
           // 성공적으로 처리된 응답
           setRecent(res.data.data);
           setContents(res.data.data);
-          setFilteredContents(res.data.data)
+          setFilteredContents(res.data.data);
+          updateScrabStatus(res.data.data);
+          console.log(isScrab);
         })
         .catch((err) => {
           console.log(err);
@@ -347,7 +355,7 @@ function Mypage(props) {
         {mysol ?
         <QuestionBtn contents={filteredContents} inmypage={inMypage} handleGoAnswer={handleGoAnswer} mysol={mysol}/>
         :
-        <QuestionBtn contents={filteredContents} inmypage={inMypage} />
+        <QuestionBtn contents={filteredContents} inmypage={inMypage} isBookScrab={isScrab}/>
         }
     </Container>
     <br/>

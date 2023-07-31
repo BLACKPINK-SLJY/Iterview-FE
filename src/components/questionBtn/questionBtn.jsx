@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import { postRefreshToken } from '../../instance/apis';
 
 function QuestionBtn(props) {
-  const { ischoose, contents, handleQuestionClick, selectedQuestionIds, inmypage, handleGoAnswer, mysol } = props;
+  const { ischoose, contents, handleQuestionClick, selectedQuestionIds, inmypage, handleGoAnswer, mysol, isBookScrab } = props;
   const [isScrab, setIsScrab] = useRecoilState(ScrabedState);
   const [user, setUser] = useRecoilState(UserState);
   const navigate = useNavigate();
@@ -141,7 +141,7 @@ function QuestionBtn(props) {
                     }
                     {!user ?
                        <></>
-                    : isScrab[question.questionId] ?
+                    : question.bookmarked ?
                        <ScrapImg questionId={question.questionId} onClick={() => {handleUnScrab(question.questionId)}} src={Bookmarkon} alt="bookmark" />
                     :
                        <ScrapImg questionId={question.questionId} onClick={() => {handleScrab(question.questionId)}} src={Bookmarkoff} alt="bookmark" />
@@ -185,7 +185,7 @@ function QuestionBtn(props) {
                     }
                 {!user ?
                     <></>
-                : isScrab[question.questionId] ?
+                : question.bookmarked === "Y" ?
                     <ScrapImg questionId={question.questionId} onClick={() => {handleUnScrab(question.questionId)}} src={Bookmarkon} alt="bookmark" />
                 :
                     <ScrapImg questionId={question.questionId} onClick={() => {handleScrab(question.questionId)}} src={Bookmarkoff} alt="bookmark" />
