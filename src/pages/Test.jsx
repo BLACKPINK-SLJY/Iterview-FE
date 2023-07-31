@@ -270,6 +270,7 @@ const SubmitBtn = styled.button`
   cursor: pointer;
   &:disabled {
       cursor: not-allowed;
+      background: ${colors.black_20};
   }
 `
 const TextStyle = styled.div`

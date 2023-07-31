@@ -313,13 +313,13 @@ function Question() {
         <QuestionBtn contents={questions} ischoose={ischoose} handleRandom={handleRandom} />
         }
         <br/>
-        {ischoose ?
+    </Container>
+    <Footer />
+    {ischoose ?
         <GoTestBtn disabled={selectedQuestionIds.length === 0} onClick={() => navigate('/interview')}>면접 보기 ({selectedQuestionIds.length})</GoTestBtn>
         :
         <GoTestBtn disabled={!user} onClick={() => navigate('/interview')}>면접 보기</GoTestBtn>
         }
-    </Container>
-    <Footer />
     </>
   )
 }
@@ -373,7 +373,7 @@ const GoTestBtn = styled.button`
     z-index: 2;
     width: 190px;
     height: 62px;
-    position: fixed;
+    position: sticky;
     left: calc(50% - 194.35px/2 - 0.33px);
     bottom: 40px;
     box-shadow: 0px 0px 9.20818px rgba(0, 0, 0, 0.1);

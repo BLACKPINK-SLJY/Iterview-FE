@@ -6,12 +6,13 @@ import DropDownBtn from '../components/toggle/DropDownBtn';
 import QuestionBtn from '../components/questionBtn/questionBtn';
 import X from "../assets/svg/xBtn.svg";
 import { useRecoilState } from 'recoil';
-import { ClickedState } from '../recoil/QuestionState';
+import { ClickedState, QuestionState } from '../recoil/QuestionState';
 import { useEffect } from 'react';
 import Footer from '../components/footer/Footer';
 import colors from '../style/color';
 import { UserState } from '../recoil/userState';
 import NotAccess from './NotAccess';
+import { ColorRing } from 'react-loader-spinner';
 
 function Search() {
     const [user, setUser] = useRecoilState(UserState);
@@ -20,14 +21,18 @@ function Search() {
     const navigate = useNavigate();
     const search = location.state?.content;
     const [result, setResult] = useState(location.state?.searchResult);
+    const [resultQuestion, setResultQuestion] = useRecoilState(QuestionState);
     const [ischoose, setIsChoose] = useState(true);
+    const [loading,setLoading] = useState(true);
 
     useEffect(() => {
         if(result){
           setResult(location.state.searchResult.sort((a,b) => a.level - b.level));
           setclickedQuestion([]);
+          setLoading(false);
+          setResultQuestion(location.state.searchResult);
         }
-      }, [location.state?.searchResult]);
+      }, [location.state?.searchResult, setResultQuestion]);
 
 
 
@@ -62,34 +67,55 @@ function Search() {
     {user ?
     <>
     <Nav/>
-    <Container>
-    <SearchTitle>"{search}" 검색결과</SearchTitle>
-    <br/>
-    <br/>
-    <br/>
-    {result && result.length > 0 ?
-    <>
-    <div style={{display:'flex', flexDirection:'row-reverse'}}>
-    <DropDownBtn handleDropDown={(selectedValue) => handleDropDown(selectedValue)}/>
-    </div>
-    <QuestionBtn contents={result} ischoose={ischoose} handleQuestionClick={handleQuestionClick} selectedQuestionIds={selectedQuestionIds}/>
-    <GoTestBtn disabled={selectedQuestionIds.length === 0} onClick={() => navigate('/interview')}>면접 보기 ({selectedQuestionIds.length})</GoTestBtn>
-    </>
-    :
-    <div style={{justifyContent:'center', textAlign:'center', marginTop:'104px'}}>
-    <img src={X} style={{width: "28px", height: "28px", margin: "0 auto", textAlign:"center", marginTop:"18px", marginBottom:"28px"}} alt='x'/>
-    <div style={{display: "flex", flexDirection:"row", fontWeight:"600", fontSize:"26px", lineHeight:"35px", margin: "0 auto", textAlign:"center", marginBottom:"28px", justifyContent:'center'}}>
-    <div style={{color: "#DB5752"}}>"{search}"</div>
-    <div>에 대한 질문이 없어요!</div>
-    </div>
-    <div style={{margin: "0 auto", textAlign:"center", color:"#ACADAD", fontWeight:"600", fontSize:"21px", lineHeight:"180.2%"}}>단어의 철자가 정확한지 확인해보시고</div>
-    <div style={{margin: "0 auto", textAlign:"center", color:"#ACADAD", fontWeight:"600", fontSize:"21px", lineHeight:"180.2%", marginBottom:"700px"}}>다른 검색어를 입력해 보세요</div>
-    </div>
+    {loading ?
+      <>
+      <div style={{textAlign: "center", marginTop: "350px"}}>
+        <ColorRing
+        visible={true}
+        height="100"
+        width="100"
+        ariaLabel="blocks-loading"
+        wrapperStyle={{}}
+        wrapperClass="blocks-wrapper"
+        colors={['#9E3DFF', '#3840FF', '#ACADAD', '#9E3DFF', '#3840FF']}
+        />
+        <div style={{paddingTop:"30px", fontSize:"30px"}}>답변 불러오는 중...</div>
+      </div>
+      </>
+      :
+      <>
+      <Container>
+      <SearchTitle>"{search}" 검색결과</SearchTitle>
+      <br/>
+      <br/>
+      <br/>
+      {result && result.length > 0 ?
+      <>
+      <div style={{display:'flex', flexDirection:'row-reverse'}}>
+      <DropDownBtn handleDropDown={(selectedValue) => handleDropDown(selectedValue)}/>
+      </div>
+      <QuestionBtn contents={result} ischoose={ischoose} handleQuestionClick={handleQuestionClick} selectedQuestionIds={selectedQuestionIds}/>
+      </>
+      :
+      <div style={{justifyContent:'center', textAlign:'center', marginTop:'104px'}}>
+      <img src={X} style={{width: "28px", height: "28px", margin: "0 auto", textAlign:"center", marginTop:"18px", marginBottom:"28px"}} alt='x'/>
+      <div style={{display: "flex", flexDirection:"row", fontWeight:"600", fontSize:"26px", lineHeight:"35px", margin: "0 auto", textAlign:"center", marginBottom:"28px", justifyContent:'center'}}>
+      <div style={{color: "#DB5752"}}>"{search}"</div>
+      <div>에 대한 질문이 없어요!</div>
+      </div>
+      <div style={{margin: "0 auto", textAlign:"center", color:"#ACADAD", fontWeight:"600", fontSize:"21px", lineHeight:"180.2%"}}>단어의 철자가 정확한지 확인해보시고</div>
+      <div style={{margin: "0 auto", textAlign:"center", color:"#ACADAD", fontWeight:"600", fontSize:"21px", lineHeight:"180.2%", marginBottom:"700px"}}>다른 검색어를 입력해 보세요</div>
+      </div>
+      }
+      </Container>
+      <br/>
+      <br/>
+      <Footer />
+      {result && result.length > 0 &&
+            <GoTestBtn disabled={selectedQuestionIds.length === 0} onClick={() => navigate('/interview')}>면접 보기 ({selectedQuestionIds.length})</GoTestBtn>
+      }
+      </>
     }
-    </Container>
-    <br/>
-    <br/>
-    <Footer />
     </>
     :
     <>
@@ -130,7 +156,7 @@ const GoTestBtn = styled.button`
     z-index: 2;
     width: 190px;
     height: 62px;
-    position: fixed;
+    position: sticky;
     left: calc(50% - 194.35px/2 - 0.33px);
     bottom: 40px;
     box-shadow: 0px 0px 9.20818px rgba(0, 0, 0, 0.1);

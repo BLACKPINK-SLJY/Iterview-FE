@@ -143,18 +143,18 @@ const Recorder = ((props) => {
     }
   }
 
-  const onClickCameraOpen = () => {
-    if (recordWebcam.status !== 'OPEN') {
-      recordWebcam.open();
-      stopTime();
-      setShouldStartRecording(false);
-    }
-  }
+  // const onClickCameraOpen = () => {
+  //   if (recordWebcam.status !== 'OPEN') {
+  //     recordWebcam.open();
+  //     stopTime();
+  //     setShouldStartRecording(false);
+  //   }
+  // }
 
-  const onClickRecordClose = () => {
-    recordWebcam.close();
-    stopTime();
-  }
+  // const onClickRecordClose = () => {
+  //   recordWebcam.close();
+  //   stopTime();
+  // }
 
   const handleSubmitAnswer = async () => {
     const isblob = await recordWebcam.getRecording({type: "video/webm"});
@@ -330,22 +330,6 @@ const Recorder = ((props) => {
           >
             다시 녹화
           </RecorderBtnStyle>
-          <RecorderBtnStyle
-            disabled={
-              recordWebcam.status === "OPEN" ||
-              recordWebcam.status === "RECORDING" ||
-              recordWebcam.status === "PREVIEW"
-            }
-            onClick={onClickCameraOpen}
-          >
-            카메라 켜기
-          </RecorderBtnStyle>
-          <RecorderBtnStyle
-            disabled={recordWebcam.status === "CLOSED"}
-            onClick={onClickRecordClose}
-          >
-            카메라 끄기
-          </RecorderBtnStyle>
         </BtnLayout>
         {
           isalert &&
@@ -441,12 +425,24 @@ const Blinkanimation = styled.div`
   animation: ${blink} 1s step-end infinite;;
 `
 const Video = styled.video`
+    position: absolute;
     width: 1100px;
     height: 600px;
 
     @media screen and (max-width: 1000px) {
         width: 768px;
         height: 450px;
+    }
+
+    #controller{
+      top: 24% !important;
+      left: 12% !important;
+    }
+
+    #top-layer {
+      position: absolute;
+      top: 40%;
+      right: 40%;
     }
 `
 const VideoDiv = styled.div`

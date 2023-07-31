@@ -39,7 +39,7 @@ function Signup() {
                 alert("이미 사용중인 계정입니다.");
             }
             if(res.data.status === 20100) {
-                alert("회원가입 성공!");
+                alert("회원가입이 정상적으로 처리되었습니다. \n로그인 페이지로 이동합니다.");
                 navigate("/login");
             }
         })
