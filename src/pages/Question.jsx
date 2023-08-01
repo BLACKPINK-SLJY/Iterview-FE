@@ -45,26 +45,18 @@ function Question() {
 
     const shouldSendHeader = !!user;
 
-    const [axiosConfig, setAxiosConfig] = useState({
-        headers: {},
-        params: {
-          category: category,
-        },
-      });
+    const configWithToken = {
+      headers: shouldSendHeader ? { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } : {},
+      params: {
+        category: category,
+      },
+    };
     
     useEffect(() => {
         setQuestions([]);
         if (ischoose) {
-          const configWithToken = {
-            headers: shouldSendHeader ? { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } : {},
-            params: {
-              category: category,
-            },
-          };
-          setAxiosConfig(configWithToken); // axiosConfig 업데이트
-      
           axios
-            .get(`${BaseUrl}/question/list/order/level`, axiosConfig) // 수정: 수정된 axiosConfig 사용
+            .get(`${BaseUrl}/question/list/order/level`, configWithToken) // 수정: 수정된 axiosConfig 사용
             .then((res) => {
               if(!alertShown){
               setAlertShown(true);
@@ -107,15 +99,8 @@ function Question() {
               setAlertShown(false); // 경고창이 띄워진 후에 1초 뒤에 false로 변경
             });
         } else {
-            const configWithToken = {
-                headers: shouldSendHeader ? { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } : {},
-                params: {
-                  category: category,
-                },
-              };
-              setAxiosConfig(configWithToken);
           axios
-            .get(`${BaseUrl}/question/random`, axiosConfig) // 수정: 수정된 axiosConfig 사용
+            .get(`${BaseUrl}/question/random`, configWithToken) // 수정: 수정된 axiosConfig 사용
             .then((res) => {
               if(!alertShown) {
               setAlertShown(true);
@@ -157,7 +142,7 @@ function Question() {
               setAlertShown(false); // 경고창이 띄워진 후에 1초 뒤에 false로 변경
             });
         }
-      }, [category, ischoose]);
+      }, [category, ischoose, user]);
 
     useEffect(() => {
       }, [selectedQuestionIds, category]);
@@ -174,15 +159,7 @@ function Question() {
     }, [category])
 
     const handleRandom = () => {
-      const configWithToken = {
-        headers: shouldSendHeader ? { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } : {},
-        params: {
-          category: category,
-        },
-      };
-      setAxiosConfig(configWithToken); // axiosConfig 업데이트
-
-        axios.get(`${BaseUrl}/question/random`, axiosConfig)
+        axios.get(`${BaseUrl}/question/random`, configWithToken)
         .then((res) => {
           if(!alertShown){
           setAlertShown(true);
@@ -229,15 +206,8 @@ function Question() {
     const favoriteArr = questionArr.sort((a, b) => b.entireBookmarkedCount - a.entireBookmarkedCount);
 
     const handleDropDown = (selectedValue) => {
-      const configWithToken = {
-        headers: shouldSendHeader ? { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } : {},
-        params: {
-          category: category,
-        },
-      };
-      setAxiosConfig(configWithToken);
         axios
-        .get(`${BaseUrl}/question/list/order/level`, axiosConfig)
+        .get(`${BaseUrl}/question/list/order/level`, configWithToken)
         .then((res) => {
           if(!alertShown) {
           setAlertShown(true);
