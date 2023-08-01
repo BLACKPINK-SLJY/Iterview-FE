@@ -27,15 +27,14 @@ function Mypage(props) {
     const [filteredContents, setFilteredContents] = useState(contents);
     const navigate = useNavigate();
     const [alertShown, setAlertShown] = useState(false);
-    const isScrab = useRecoilValue(ScrabedState);
-    const setScrab = useSetRecoilState(ScrabedState);
+    const [isScrab, setIsScrab] = useRecoilState(ScrabedState);
     
     const [selectedDropDownValue, setSelectedDropDownValue] = useState("최신 순");
     const [selectedRoleDropDownValue, setSelectedRoleDropDownValue] = useState("전체");
 
-    const updateScrabStatus = (dataFromServer) => {
-      setScrab(dataFromServer);
-    };
+    // const updateScrabStatus = (dataFromServer) => {
+    //   setScrab(dataFromServer);
+    // };
 
     const shouldSendHeader = !!user;
 
@@ -51,6 +50,7 @@ function Mypage(props) {
     }
 
     useEffect(() => {
+       console.log(filteredContents);
         axios.get(`${BaseUrl}/question/list`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('accessToken')}`
@@ -210,8 +210,6 @@ function Mypage(props) {
           setRecent(res.data.data);
           setContents(res.data.data);
           setFilteredContents(res.data.data);
-          updateScrabStatus(res.data.data);
-          console.log(isScrab);
         })
         .catch((err) => {
           console.log(err);

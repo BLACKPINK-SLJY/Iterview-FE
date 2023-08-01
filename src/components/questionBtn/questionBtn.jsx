@@ -16,7 +16,7 @@ import { postRefreshToken } from '../../instance/apis';
 
 function QuestionBtn(props) {
   const { ischoose, contents, handleQuestionClick, selectedQuestionIds, inmypage, handleGoAnswer, mysol, isBookScrab } = props;
-  const [isScrab, setIsScrab] = useRecoilState(ScrabedState);
+  const [isBookmarked, setIsBookmarked] = useState({});
   const [user, setUser] = useRecoilState(UserState);
   const navigate = useNavigate();
   const [alertShown, setAlertShown] = useState(false);
@@ -26,6 +26,15 @@ function QuestionBtn(props) {
   const axiosConfig = {
       headers: shouldSendHeader ? { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } : {},
     };
+
+    useEffect(() => {
+      // contents가 변경될 때마다 각 question의 북마크 상태를 isBookmarked에 업데이트합니다.
+      const updatedIsBookmarked = {};
+      contents.forEach((question) => {
+        updatedIsBookmarked[question.questionId] = question.bookmarked === 'Y';
+      });
+      setIsBookmarked(updatedIsBookmarked);
+    }, [contents]);
 
   const handleScrab = (questionId) => {
       axios.put(`${BaseUrl}/question/bookmark/${questionId}`, null, axiosConfig)
@@ -61,7 +70,11 @@ function QuestionBtn(props) {
           })
           .then((res) => {
             // 성공적으로 처리된 응답
-            setIsScrab((prevScrab) => ({ ...prevScrab, [questionId]: true }));
+            setIsBookmarked((prevIsBookmarked) => ({
+              ...prevIsBookmarked,
+              [questionId]: true,
+            }));
+            console.log(res.data);
             return Promise.resolve(res);
           })
           .catch((err) => {
@@ -106,7 +119,11 @@ function QuestionBtn(props) {
           })
           .then((res) => {
             // 성공적으로 처리된 응답
-            setIsScrab((prevScrab) => ({ ...prevScrab, [questionId]: false }));
+            setIsBookmarked((prevIsBookmarked) => ({
+              ...prevIsBookmarked,
+              [questionId]: false,
+            }));
+            console.log(res.data);
             return Promise.resolve(res);
           })
           .catch((err) => {
@@ -116,6 +133,16 @@ function QuestionBtn(props) {
             setAlertShown(false); // 경고창이 띄워진 후에 1초 뒤에 false로 변경
           });
 }
+
+const handleScrabOrUnScrab = (questionId) => {
+  if (isBookmarked[questionId]) {
+    // 이미 북마크되어 있으면 해제합니다
+    handleUnScrab(questionId);
+  } else {
+    // 북마크되어 있지 않으면 북마크합니다
+    handleScrab(questionId);
+  }
+};
 
   return (
     <>
@@ -141,10 +168,14 @@ function QuestionBtn(props) {
                     }
                     {!user ?
                        <></>
-                    : question.bookmarked ?
-                       <ScrapImg questionId={question.questionId} onClick={() => {handleUnScrab(question.questionId)}} src={Bookmarkon} alt="bookmark" />
                     :
-                       <ScrapImg questionId={question.questionId} onClick={() => {handleScrab(question.questionId)}} src={Bookmarkoff} alt="bookmark" />
+                    <ScrapImg
+                    questionId={question.questionId}
+                    isBookmarked={isBookmarked[question.questionId]}
+                    onClick={() => handleScrabOrUnScrab(question.questionId)}
+                    src={isBookmarked[question.questionId] ? Bookmarkon : Bookmarkoff}
+                    alt="bookmark"
+                    />
                     }
                     </div>
                 </Contents>
@@ -185,10 +216,14 @@ function QuestionBtn(props) {
                     }
                 {!user ?
                     <></>
-                : question.bookmarked === "Y" ?
-                    <ScrapImg questionId={question.questionId} onClick={() => {handleUnScrab(question.questionId)}} src={Bookmarkon} alt="bookmark" />
-                :
-                    <ScrapImg questionId={question.questionId} onClick={() => {handleScrab(question.questionId)}} src={Bookmarkoff} alt="bookmark" />
+                : 
+                <ScrapImg
+                questionId={question.questionId}
+                isBookmarked={isBookmarked[question.questionId]}
+                onClick={() => handleScrabOrUnScrab(question.questionId)}
+                src={isBookmarked[question.questionId] ? Bookmarkon : Bookmarkoff}
+                alt="bookmark"
+                />
                 }
               </div>
           </Contents>
