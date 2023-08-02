@@ -4,7 +4,7 @@ import { styled } from 'styled-components';
 import Footer from '../components/footer/Footer';
 import QImg from '../assets/svg/Q.svg';
 import { useRecoilState } from 'recoil';
-import { AnsweredState, QuestionState, ScrabedState } from '../recoil/QuestionState';
+import { AnsweredState, QuestionState } from '../recoil/QuestionState';
 import colors from '../style/color';
 import axios from 'axios';
 import { UserState } from '../recoil/userState';
@@ -21,12 +21,15 @@ import { postRefreshToken } from '../instance/apis';
 function Answer() {
     const [questions, setQuestions] = useRecoilState(QuestionState);
     const [isAnswer, setIsAnswer] = useRecoilState(AnsweredState);
-    const [isScrab, setIsScrab] = useRecoilState(ScrabedState);
     const [user, setUser] = useRecoilState(UserState);
     const [dummy, setIsdummy] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+    const [answeredQuestion, setAnsweredQuestion] = useState(questions.filter((item) => item.questionId === isAnswer));
 
+    useEffect(() => {
+      
+    }, [answeredQuestion])
     useEffect(() => {
         let interval = null;
     
@@ -94,22 +97,13 @@ function Answer() {
       };
 
       const shouldSendHeader = !!user;
-
-      const [axiosConfig, setAxiosConfig] = useState({
-          headers: {},
-        });
-
-    const answeredQuestion = questions.filter((item) => item.questionId === isAnswer);
-
      
     const handleScrab = (questionId) => {
         const configWithToken = {
             headers: shouldSendHeader ? { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } : {},
           };
 
-          setAxiosConfig(configWithToken); // axiosConfig 업데이트
-
-        axios.put(`${BaseUrl}/question/bookmark/${questionId}`, null, axiosConfig)
+        axios.put(`${BaseUrl}/question/bookmark/${questionId}`, null, configWithToken)
         .then((res) => {
             if (res.data.status === 40003) {
                 if (res.data.message === "엑세스 토큰의 유효기간이 만료되었습니다.") {
@@ -140,7 +134,21 @@ function Answer() {
             })
             .then((res) => {
               // 성공적으로 처리된 응답
-              setIsScrab((prevScrab) => ({ ...prevScrab, [questionId]: true }));
+              setAnsweredQuestion((prevAnsweredQuestions) => {
+                const updatedQuestions = prevAnsweredQuestions.map((question, index) => {
+                    if (index === 0) {
+                        return {
+                            ...question,
+                            bookmarked: "N",
+                        };
+                    }
+                    return question;
+                });
+                return updatedQuestions;
+            });
+            
+              console.log(answeredQuestion[0])
+              // setIsScrab((prevScrab) => ({ ...prevScrab, [questionId]: true }));
               return Promise.resolve(res);
             })
             .catch((err) => {
@@ -153,9 +161,7 @@ function Answer() {
             headers: shouldSendHeader ? { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } : {},
           };
 
-          setAxiosConfig(configWithToken); // axiosConfig 업데이트
-
-      axios.put(`${BaseUrl}/question/unbookmark/${questionId}`, null, axiosConfig)
+      axios.put(`${BaseUrl}/question/unbookmark/${questionId}`, null, configWithToken)
       .then((res) => {
         if (res.data.status === 40003) {
             if (res.data.message === "엑세스 토큰의 유효기간이 만료되었습니다.") {
@@ -186,13 +192,32 @@ function Answer() {
         })
         .then((res) => {
           // 성공적으로 처리된 응답
-          setIsScrab((prevScrab) => ({ ...prevScrab, [questionId]: false }));
+            setAnsweredQuestion((prevAnsweredQuestions) => {
+              const updatedQuestions = prevAnsweredQuestions.map((question, index) => {
+                  if (index === 0) {
+                      return {
+                          ...question,
+                          bookmarked: "Y",
+                      };
+                  }
+                  return question;
+              });
+              return updatedQuestions;
+          });
           return Promise.resolve(res);
         })
         .catch((err) => {
           console.log(err);
         });
   }
+
+  const handleBookmarkClick = (questionId) => {
+    if (answeredQuestion[0].bookmarked === "Y") {
+      handleUnScrab(questionId);
+    } else {
+      handleScrab(questionId);
+    }
+  };
 
   const handleGoVideo = () => {
     navigate(`/mypage/${user.account}/${isAnswer}/video`);
@@ -234,11 +259,12 @@ function Answer() {
               <Tag question={answeredQuestion[0]}/>
               </TagList>
               <div style={{display:'flex', gap:'15px'}}>
-              {isScrab[answeredQuestion[0].questionId] ?
-                       <ScrapImg questionId={answeredQuestion[0].questionId} onClick={() => {handleUnScrab(answeredQuestion[0].questionId)}} src={Bookmarkon} alt="bookmark" />
-                    :
-                       <ScrapImg questionId={answeredQuestion[0].questionId} onClick={() => {handleScrab(answeredQuestion[0].questionId)}} src={Bookmarkoff} alt="bookmark" />
-                    }
+              <ScrapImg
+                questionId={answeredQuestion[0].questionId}
+                onClick={() => handleBookmarkClick(answeredQuestion[0].questionId)}
+                src={answeredQuestion[0].bookmarked === "Y" ? Bookmarkon : Bookmarkoff}
+                alt="bookmark"
+              />
               </div>
           </Contents>
         </QuestionBox>

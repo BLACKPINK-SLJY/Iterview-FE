@@ -9,7 +9,6 @@ import LevelTag from '../toggle/tag/LevelTag';
 import axios from 'axios';
 import { useRecoilState } from 'recoil';
 import { UserState } from '../../recoil/userState';
-import { ScrabedState } from '../../recoil/QuestionState';
 import { BaseUrl } from '../../privateKey';
 import { useNavigate } from 'react-router-dom';
 import { postRefreshToken } from '../../instance/apis';
@@ -123,7 +122,6 @@ function QuestionBtn(props) {
               ...prevIsBookmarked,
               [questionId]: false,
             }));
-            console.log(res.data);
             return Promise.resolve(res);
           })
           .catch((err) => {
